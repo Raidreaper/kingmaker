@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Obaniwa Michael - Full-Stack Developer specializing in React Native, Flutter, and modern web technologies. View my portfolio showcasing mobile apps, web projects, and innovative solutions.">
+    <meta name="keywords" content="React Native, Flutter, Full-Stack Developer, Mobile Development, Web Development, JavaScript, Node.js, MongoDB, Portfolio, Obaniwa Michael">
+    <meta name="author" content="Obaniwa Michael">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Obaniwa Michael - Full-Stack Developer Portfolio">
+    <meta property="og:description" content="Full-Stack Developer specializing in React Native, Flutter, and modern web technologies. View my portfolio showcasing mobile apps, web projects, and innovative solutions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kingmaker.infy.uk">
+    <meta property="og:image" content="https://kingmaker.infy.uk/assets/m1.png">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Obaniwa Michael - Full-Stack Developer Portfolio">
+    <meta name="twitter:description" content="Full-Stack Developer specializing in React Native, Flutter, and modern web technologies.">
+    
+    <title>Obaniwa Michael - Full-Stack Developer Portfolio | React Native & Flutter Expert</title>
+  </head>
+  <body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Page Overlay -->
+    <div class="page-overlay"></div>
+    
+    <div id="app">
+      <!-- Header -->
+      <header class="header">
+                     <div class="logo">
+               <div class="logo-icon">
+                 <span>R</span><span>a</span><span>i</span><span>d</span><span>r</span><span>e</span><span>a</span><span>p</span><span>e</span><span>r</span>
+               </div>
+             </div>
+                 <nav class="navigation">
+          <a href="index.html" class="nav-link active">Home</a>
+           <button class="nav-link contact-btn" id="headerContactBtn">
+               Contact Me
+           </button>
+         </nav>
+        <div class="header-actions">
+          <button class="icon-btn search-btn">🔍</button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Left Section -->
+        <section class="left-section">
+          <h1 class="section-title">Welcome to my Portfolio</h1>
+          <p class="section-text">
+            I'm Obaniwa Michael, a passionate Full-Stack Developer with 5+ years of experience specializing in React Native & Flutter development. I work remotely and love creating innovative mobile applications.
+          </p>
+                   <div class="cta-buttons">
+           <button class="btn btn-primary" id="contactBtn">Contact Me</button>
+           <a href="projects.html" class="btn btn-secondary">My Projects</a>
+         </div>
+        </section>
+
+        <!-- Center Character -->
+        <div class="character-container">
+          <div class="character">
+            <div class="slideshow-container">
+              <div class="slide" data-animation="slideInFromRight">
+                <img src="./assets/0bc01043-fdda-425b-83dc-b9a7b8c767cf-removebg-preview (1).png" alt="Character 2" class="character-image">
+              </div>
+              <div class="slide" data-animation="slideInFromLeft">
+                <img src="./assets/3c8dd89c-93cc-4e49-b48b-e44e2057b8b0-removebg-preview.png" alt="Character 3" class="character-image">
+              </div>
+              <div class="slide" data-animation="zoomInRotate">
+                <img src="./assets/6d2607f5-6d33-4338-8797-95504a0a2a42-removebg-preview.png" alt="Character 4" class="character-image">
+              </div>
+              <div class="slide" data-animation="bounceIn">
+                <img src="./assets/7f2252e4-eefc-43ab-96d7-867a5cb6f51e-removebg-preview.png" alt="Character 5" class="character-image">
+              </div>
+              <div class="slide" data-animation="flipInX">
+                <img src="./assets/131adf74-1fb8-47e4-ab84-313df10c685b-removebg-preview (1).png" alt="Character 6" class="character-image">
+              </div>
+              <div class="slide" data-animation="fadeInUp">
+                <img src="./assets/131adf74-1fb8-47e4-ab84-313df10c685b-removebg-preview.png" alt="Character 7" class="character-image">
+              </div>
+              <div class="slide" data-animation="slideInFromTop">
+                <img src="./assets/Jujutsu_Kaisen-removebg-preview.png" alt="Character 8" class="character-image">
+              </div>
+            </div>
+            <div class="scroll-indicator"></div>
+          </div>
+        </div>
+
+        <!-- Right Section -->
+        <section class="right-section">
+          <h2 class="section-title">About me</h2>
+          <p class="section-text">
+            Full-Stack Developer with expertise in mobile app development using React Native and Flutter. I specialize in creating cross-platform applications that deliver exceptional user experiences.
+          </p>
+                     <div class="cta-buttons">
+             <button class="btn btn-download" id="cvBtn">Download CV</button>
+           </div>
+        </section>
+        <!-- AI Chat Button - Floating Action Button -->
+        <div class="ai-chat-fab" id="aiChatFab">
+          <div class="ai-chat-icon">🤖</div>
+          <div class="ai-chat-label">AI Assistant</div>
+        </div>
+
+        <!-- AI Chat Modal -->
+        <div class="ai-chat-modal" id="aiChatModal">
+          <div class="ai-chat-header">
+            <div class="ai-chat-title">
+              <span class="ai-avatar">🤖</span>
+              <span>RaidBot</span>
+            </div>
+            <button class="ai-chat-close" id="aiChatClose">×</button>
+          </div>
+          
+          <div class="ai-chat-messages" id="aiChatMessages">
+            <!-- Welcome message will be added here -->
+          </div>
+          
+          <div class="ai-chat-input-container">
+            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask me about this portfolio...">
+            <button class="ai-chat-send" id="aiChatSend">➤</button>
+          </div>
+        </div>
+
+        <!-- AI Chat Overlay -->
+        <div class="ai-chat-overlay" id="aiChatOverlay"></div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="copyright">
+          @2025 Obaniwa Michael all rights reserved
+        </div>
+        <div class="social-links">
+          <a href="https://wa.me/08071897468?text=Hello%20Obaniwa%20Michael!%20I%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you." target="_blank" class="social-icon whatsapp" title="WhatsApp">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+            </svg>
+          </a>
+          <a href="https://github.com/Raidreaper" target="_blank" class="social-icon github" title="GitHub">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 4.624-5.479 4.862.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="mailto:Obaniwamichael17@gmail.com?subject=Portfolio%20Inquiry&body=Hello%20Obaniwa%20Michael,%0A%0AI%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you.%0A%0ABest%20regards," class="social-icon email" title="Email">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 7.713-9.518-7.713h19.036zm-19.518 14v-11.817l10 8.104 10-8.104v11.817h-20z"/>
+            </svg>
+          </a>
+        </div>
+       </footer>
+     </div>
+     
+     <!-- CV Preview Modal -->
+     <div id="cvModal" class="modal">
+       <div class="modal-content">
+         <div class="modal-header">
+           <h2>My CV Preview</h2>
+           <button class="close-btn" id="closeCvModal">&times;</button>
+         </div>
+         <div class="modal-body">
+           <div id="cvContent">
+             <div id="cvLoading" style="text-align: center; padding: 2rem;">
+               <div class="cv-loading-icon">⏳</div>
+               <h3>Loading CV Preview...</h3>
+               <p>Please wait while CV is loading.</p>
+             </div>
+             <iframe id="cvIframe"
+               src="./assets/Michael cv.pdf"
+               width="100%"
+               height="500px"
+               frameborder="0"
+               style="display: none;">
+             </iframe>
+             <div id="cvError" style="display: none; text-align: center; padding: 2rem;">
+               <div class="cv-error-icon">⚠️</div>
+               <h3>CV Preview Unavailable</h3>
+               <p>The CV preview couldn't be loaded. This might be because:</p>
+               <ul style="text-align: left; max-width: 400px; margin: 1rem auto;">
+                 <li>The PDF file is not available</li>
+                 <li>Your browser doesn't support PDF preview</li>
+                 <li>There was a network error</li>
+               </ul>
+               <p><strong>You can still download the CV using the buttons below.</strong></p>
+             </div>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <div class="cv-download-options">
+             <button class="btn btn-primary" id="downloadCvPdfBtn">Download PDF</button>
+             <button class="btn btn-secondary" id="downloadCvDocxBtn">Download DOCX</button>
+           </div>
+           <button class="btn btn-secondary" id="closeCvModalBtn">Close</button>
+         </div>
+       </div>
+     </div>
+     
+     <!-- Contact Modal -->
+     <div id="contactModal" class="modal">
+       <div class="modal-content">
+         <div class="modal-header">
+           <h2>Contact Me</h2>
+           <button class="close-btn" id="closeContactModal">&times;</button>
+         </div>
+         <div class="modal-body">
+           <div class="contact-options">
+             <div class="contact-option">
+               <div class="contact-icon">📧</div>
+               <div class="contact-details">
+                 <h3>Email</h3>
+                 <p>Obaniwamichael17@gmail.com</p>
+                 <button class="btn btn-primary" id="emailBtn">Send Email</button>
+               </div>
+             </div>
+             <div class="contact-option">
+               <div class="contact-icon">📞</div>
+               <div class="contact-details">
+                 <h3>Phone</h3>
+                 <p>08071897468</p>
+                 <button class="btn btn-primary" id="phoneBtn">Call Now</button>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+    <script src="./main.js"></script>
+    <script>
+      // Enhanced Slideshow functionality with image preloading
+      class AdvancedSlideshow {
+        constructor() {
+          this.currentSlide = 0;
+          this.slides = document.querySelectorAll('.slide');
+          this.totalSlides = this.slides.length;
+          this.interval = null;
+          this.isTransitioning = false;
+          
+          this.init();
+        }
+        
+        init() {
+          // Preload all images first
+          this.preloadImages().then(() => {
+            this.startSlideshow();
+            this.setupEventListeners();
+          });
+        }
+        
+        preloadImages() {
+          const imagePromises = Array.from(this.slides).map(slide => {
+            const img = slide.querySelector('img');
+            if (img && img.src) {
+              return new Promise((resolve, reject) => {
+                const tempImg = new Image();
+                tempImg.onload = () => resolve();
+                tempImg.onerror = () => reject();
+                tempImg.src = img.src;
+              });
+            }
+            return Promise.resolve();
+          });
+          
+          return Promise.all(imagePromises);
+        }
+        
+        startSlideshow() {
+          this.interval = setInterval(() => {
+            if (!this.isTransitioning) {
+              this.nextSlide();
+            }
+          }, 4500);
+        }
+        
+        nextSlide() {
+          if (this.isTransitioning) return;
+          
+          this.isTransitioning = true;
+          
+          // Remove active class from current slide
+          this.slides[this.currentSlide].classList.remove('active');
+          
+          // Move to next slide
+          this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+          
+          // Add active class to new slide
+          this.slides[this.currentSlide].classList.add('active');
+          
+          // Reset transition flag after animation completes
+          setTimeout(() => {
+            this.isTransitioning = false;
+          }, 800);
+        }
+        
+        setupEventListeners() {
+          // Pause slideshow on hover
+          const slideshowContainer = document.querySelector('.slideshow-container');
+          if (slideshowContainer) {
+            slideshowContainer.addEventListener('mouseenter', () => {
+              if (this.interval) {
+                clearInterval(this.interval);
+              }
+            });
+            
+            slideshowContainer.addEventListener('mouseleave', () => {
+              this.startSlideshow();
+            });
+          }
+          
+          // Touch events for mobile
+          let touchStartX = 0;
+          let touchEndX = 0;
+          
+          slideshowContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+          }, { passive: true });
+          
+          slideshowContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            this.handleSwipe();
+          }, { passive: true });
+        }
+        
+        handleSwipe() {
+          const swipeThreshold = 50;
+          const diff = touchStartX - touchEndX;
+          
+          if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+              // Swipe left - next slide
+              this.nextSlide();
+            } else {
+              // Swipe right - previous slide
+              this.previousSlide();
+            }
+          }
+        }
+        
+        previousSlide() {
+          if (this.isTransitioning) return;
+          
+          this.isTransitioning = true;
+          
+          // Remove active class from current slide
+          this.slides[this.currentSlide].classList.remove('active');
+          
+          // Move to previous slide
+          this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+          
+          // Add active class to new slide
+          this.slides[this.currentSlide].classList.add('active');
+          
+          // Reset transition flag after animation completes
+          setTimeout(() => {
+            this.isTransitioning = false;
+          }, 800);
+        }
+      }
+      
+      // Initialize slideshow when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        new AdvancedSlideshow();
+      });
+    </script>
+  </body>
+</html>
