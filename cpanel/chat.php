@@ -19,7 +19,7 @@ if ($origin && in_array($origin, $allowed_origins, true)) {
     header('Access-Control-Allow-Origin: ' . $origin);
 } else if (!$origin) {
     // Non-browser clients (no Origin) - allow
-header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Origin: *');
 }
 
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -160,3 +160,5 @@ try {
     ]);
 }
 ?>
+
+

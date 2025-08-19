@@ -18,7 +18,7 @@ A **real AI-powered chat assistant** for your portfolio using Groq's Llama 4 Sco
 
 1. **Upload your portfolio files** to your cPanel hosting
 2. **Ensure these files exist:**
-   - `api/chat.php` ✅ (PHP backend)
+   - `cpanel/chat.php` ✅ (PHP backend to upload as `api/chat.php` on server)
    - `config.php` ✅ (API key configuration)
    - `main.js` ✅ (updated for PHP)
    - All HTML, CSS, and other files
@@ -33,7 +33,7 @@ public_html/
 ├── style.css
 ├── main.js
 ├── api/
-│   └── chat.php
+│   └── chat.php  (upload from `cpanel/chat.php` in repo)
 └── config.php (or outside public_html for security)
 ```
 
