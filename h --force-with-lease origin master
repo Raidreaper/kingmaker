@@ -1,0 +1,5 @@
+[33md1451c3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: remove cPanel reference comment for clean Vercel deployment
+[33maed5d3d[m fix: add type='module' to script tags for Vite compatibility
+[33m5597e12[m fix: update MindSpace AI project image path to correct filename
+[33m6ea9556[m feat: add MindSpace AI project and scroll progress bar to projects page
+[33m13444c4[m refactor: remove cPanel configs, optimize for Vercel deployment

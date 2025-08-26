@@ -1,0 +1,36 @@
+# Development files
+node_modules/
+.vite/
+*.log
+
+# Build artifacts (will be generated during build)
+dist/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+VERCEL_DEPLOYMENT_GUIDE.md
+AI_CHAT_README.md
+
+# Test files
+test-groq.html
