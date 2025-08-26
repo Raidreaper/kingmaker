@@ -744,7 +744,7 @@ function initCvModal() {
   }
 }
 
-// AI Chat System - Groq AI Assistant (cPanel Version)
+  // AI Chat System - Groq AI Assistant (Vercel Version)
 class PortfolioAIAssistant {
   constructor() {
     this.messages = [];
