@@ -2115,6 +2115,40 @@ body {
   }
 }
 
+/* Scroll Progress Bar */
+.scroll-progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  width: 0%;
+  transition: width 0.1s ease;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+}
+
+/* Responsive Progress Bar */
+@media (max-width: 768px) {
+  .scroll-progress-container {
+    height: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-progress-container {
+    height: 2px;
+  }
+}
+
 /* Responsive Design for Mobile Menu - REMOVED CONFLICTING RULES */
 
 /* Skills Page Redesign Styles */

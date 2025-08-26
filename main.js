@@ -946,5 +946,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize AI Chat
   new PortfolioAIAssistant();
   
+  // Initialize Scroll Progress Bar
+  initScrollProgress();
+  
   // Test wiring removed
 });
+
+// Scroll Progress Bar Functionality
+function initScrollProgress() {
+  const progressBar = document.getElementById('scrollProgressBar');
+  if (!progressBar) return;
+  
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.pageYOffset;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+    
+    progressBar.style.width = scrollPercent + '%';
+  });
+}
