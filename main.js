@@ -749,9 +749,8 @@ class PortfolioAIAssistant {
   constructor() {
     this.messages = [];
     this.isOpen = false;
-    // Prefer Vercel serverless function, fallback to PHP on cPanel
-    this.apiUrlCandidates = ['/api/chat', './api/chat.php'];
-    this.apiUrl = this.apiUrlCandidates[0];
+    // Use Vercel serverless function
+    this.apiUrl = '/api/chat';
     this.init();
   }
 
@@ -847,52 +846,45 @@ What would you like to know? 😊`
         errorMessage = 'Unable to connect to the AI service. Please check your internet connection or try again later.';
       } else if (error.message.includes('API key not configured')) {
         errorMessage = 'AI service is not properly configured. Please contact the developer.';
-      } else if (error.message.includes('404')) {
-        errorMessage = 'AI service endpoint was not found. On cPanel, ensure api/chat.php exists and the path ./api/chat.php is correct.';
+      } else       if (error.message.includes('404')) {
+        errorMessage = 'AI service endpoint was not found. Please check if the service is properly deployed.';
       } else if (error.message.includes('500')) {
         errorMessage = 'AI service is temporarily unavailable. Please try again in a moment.';
       }
       
       this.addMessage({ 
         type: 'ai', 
-        content: `${errorMessage}\n\n💡 <strong>Note:</strong> If you are testing locally without PHP, the chat won\'t work. Upload to cPanel where PHP is enabled.` 
+        content: `${errorMessage}\n\n💡 <strong>Note:</strong> The AI chat service is deployed on Vercel. If issues persist, please contact the developer.` 
       });
     }
   }
 
   async getAIResponse(userInput) {
-    let lastError = null;
-    for (const endpoint of this.apiUrlCandidates) {
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: userInput }),
-        });
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userInput }),
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          lastError = new Error(`API request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
-          continue;
-        }
-
-        const data = await response.json();
-        if (data.error) {
-          lastError = new Error(data.error);
-          continue;
-        }
-
-        // Success
-        return data.response;
-      } catch (err) {
-        lastError = err;
-        continue;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
       }
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Success
+      return data.response;
+    } catch (err) {
+      console.error('Groq API Error:', err);
+      throw err;
     }
-    console.error('Groq API Error:', lastError);
-    throw lastError || new Error('Unknown AI service error');
   }
 
   showTypingIndicator() {
