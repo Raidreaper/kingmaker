@@ -48,7 +48,7 @@
   --accent-color: #f97316;
 }
 
-/* Particles Background */
+/* Three.js Background */
 #particles-js {
   position: fixed;
   top: 0;
@@ -57,6 +57,13 @@
   height: 100%;
   z-index: 1;
   pointer-events: none;
+  overflow: hidden;
+}
+
+#particles-js canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Page Overlay */
@@ -145,8 +152,8 @@ body {
 .header .mobile-menu {
   display: none;
   width: 100%;
-  background: rgba(255, 0, 0, 0.9) !important; /* Red background for debugging */
-  border-top: 3px solid #ffff00 !important; /* Yellow border for debugging */
+  background: var(--glass-bg);
+  border-top: 1px solid var(--glass-border);
   margin-top: 0;
   order: 1;
   position: static;
@@ -162,7 +169,7 @@ body {
   animation: slideInDown 0.3s ease-out;
   visibility: visible !important;
   opacity: 1 !important;
-  background: rgba(0, 255, 0, 0.9) !important; /* Green when visible for debugging */
+  background: var(--glass-bg);
 }
 
 @keyframes slideInDown {
@@ -3172,6 +3179,192 @@ body {
   50% { transform: scale(1.1); }
 }
 
+/* Cube Game Button */
+.cube-game-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 110px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.cube-game-fab:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+.cube-game-fab:active {
+  transform: translateY(-1px) scale(1.05);
+}
+
+.cube-game-icon {
+  font-size: 20px;
+  animation: diceRoll 3s infinite;
+}
+
+@keyframes diceRoll {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(270deg); }
+}
+
+/* Orrery Button */
+.orrery-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 170px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #4a90e2 0%, #2d1b69 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* Active state for background orrery */
+.orrery-fab.active {
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.8), 0 0 30px rgba(74, 144, 226, 0.3);
+  animation: orreryPulse 3s infinite;
+}
+
+@keyframes orreryPulse {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.8), 0 0 30px rgba(74, 144, 226, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.8), 0 0 40px rgba(74, 144, 226, 0.6);
+  }
+}
+
+.orrery-fab:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(74, 144, 226, 0.6);
+}
+
+.orrery-fab:active {
+  transform: translateY(-1px) scale(1.05);
+}
+
+.orrery-icon {
+  font-size: 20px;
+  animation: planetOrbit 4s infinite linear;
+}
+
+@keyframes planetOrbit {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.1); }
+  50% { transform: rotate(180deg) scale(1); }
+  75% { transform: rotate(270deg) scale(0.9); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Orrery Controls Panel */
+#orrery-controls {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  pointer-events: auto;
+}
+
+.orrery-control-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  min-width: 250px;
+  color: var(--text-primary);
+}
+
+.orrery-control-panel h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  color: var(--accent-color);
+  text-align: center;
+}
+
+.control-group {
+  margin-bottom: 15px;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  margin-bottom: 5px;
+  accent-color: var(--accent-color);
+}
+
+.control-group input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--accent-color);
+}
+
+.control-group button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+}
+
+.control-group button:hover {
+  background: var(--text-primary);
+  color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+#speedValue {
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-left: 10px;
+}
+
+/* Planet Labels */
+.planet-label {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* AI Chat Modal */
 .ai-chat-modal {
   position: fixed;
@@ -3412,6 +3605,33 @@ body {
     font-size: 8px;
   }
   
+  .cube-game-fab {
+    bottom: 20px;
+    right: 90px;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .cube-game-icon {
+    font-size: 18px;
+  }
+  
+  .orrery-fab {
+    bottom: 20px;
+    right: 150px;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .orrery-icon {
+    font-size: 18px;
+  }
+  
+  .orrery-control-panel {
+    min-width: 220px;
+    padding: 15px;
+  }
+  
   .ai-chat-modal {
     bottom: 100px;
     right: 20px;
@@ -3524,4 +3744,3 @@ body {
   }
 }
 
-/* Removed hamburger button debug styles */

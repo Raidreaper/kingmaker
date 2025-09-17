@@ -98,6 +98,11 @@ function changeTheme() {
   // Add new theme
   body.classList.add(themes[currentThemeIndex]);
   
+  // Update Three.js background colors to match theme
+  if (window.threeBackground) {
+    window.threeBackground.updateTheme(currentThemeIndex);
+  }
+  
   // Add transition animation
   body.classList.add('theme-transition');
   
@@ -113,9 +118,11 @@ document.body.classList.add(themes[currentThemeIndex]);
 // Change theme every 10 seconds
 setInterval(changeTheme, 10000);
 
-// Initialize particles when DOM is loaded
+// Initialize Three.js background when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  initParticles();
+  // Remove old particle system initialization
+  // initParticles(); // Replaced by Three.js
+  
   initModals();
   initNavigationDropdown();
   initEntranceAnimations();
@@ -142,6 +149,8 @@ function initModals() {
     cvBtn.addEventListener('click', () => {
       cvModal.style.display = 'block';
       document.body.style.overflow = 'hidden';
+      // Initialize CV modal when opened
+      initCvModal();
     });
   }
 
@@ -168,7 +177,7 @@ function initModals() {
       try {
         // Download PDF version
         const link = document.createElement('a');
-        link.href = './assets/Michael cv.pdf';
+        link.href = '/assets/Michael%20cv.pdf';
         link.download = 'Michael cv.pdf';
         link.click();
       } catch (error) {
@@ -183,7 +192,7 @@ function initModals() {
       try {
         // Download DOCX version
         const link = document.createElement('a');
-        link.href = './assets/Michael cv.docx';
+        link.href = '/assets/Michael%20cv.docx';
         link.download = 'Michael cv.docx';
         link.click();
       } catch (error) {
@@ -305,18 +314,27 @@ function initNavigationDropdown() {
 
 // Interactive functionality
 document.addEventListener('DOMContentLoaded', function() {
+  // Cache DOM selectors for better performance
+  const cachedElements = {
+    navLinks: document.querySelectorAll('.nav-link'),
+    searchBtn: document.querySelector('.search-btn'),
+    menuBtn: document.querySelector('.menu-btn'),
+    socialLinks: document.querySelectorAll('.social-icon'),
+    characterImage: document.querySelector('.character-image'),
+    scrollIndicator: document.querySelector('.scroll-indicator'),
+    characterContainer: document.querySelector('.character-container'),
+    leftSection: document.querySelector('.left-section'),
+    rightSection: document.querySelector('.right-section')
+  };
+  
   // Initialize navigation dropdowns
   initNavigationDropdown();
   
   // Initialize contact button functionality
   initContactButton();
   
-  // Initialize mobile menu functionality
-  // initMobileMenu removed (hamburger menu is no longer used)
-  
   // Smooth scrolling for navigation links (only for internal page links)
-  const navLinks = document.querySelectorAll('.nav-link');
-  navLinks.forEach(link => {
+  cachedElements.navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       // Only prevent default for contact dropdown items, not for actual navigation
       if (this.href && this.href.includes('#')) {
@@ -327,19 +345,14 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Header icon interactions
-  const searchBtn = document.querySelector('.search-btn');
-  const menuBtn = document.querySelector('.menu-btn');
-
-  if (searchBtn) {
-    searchBtn.addEventListener('click', function() {
+  if (cachedElements.searchBtn) {
+    cachedElements.searchBtn.addEventListener('click', function() {
       // Search functionality placeholder - can be implemented later
-      // TODO: Implement search functionality
     });
   }
 
   // Social media link interactions with bouncing effect
-  const socialLinks = document.querySelectorAll('.social-icon');
-  socialLinks.forEach(link => {
+  cachedElements.socialLinks.forEach(link => {
     // Add bouncing class by default
     link.classList.add('bouncing');
     
@@ -366,34 +379,33 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Add double-click to restart bouncing (optional feature)
-  socialLinks.forEach(link => {
+  cachedElements.socialLinks.forEach(link => {
     link.addEventListener('dblclick', function() {
       this.classList.add('bouncing');
     });
   });
 
   // Add hover effects for character image
-  const characterImage = document.querySelector('.character-image');
-  if (characterImage) {
-    characterImage.addEventListener('mouseenter', function() {
+  if (cachedElements.characterImage) {
+    cachedElements.characterImage.addEventListener('mouseenter', function() {
       this.style.transform = 'scale(1.05)';
     });
     
-    characterImage.addEventListener('mouseleave', function() {
+    cachedElements.characterImage.addEventListener('mouseleave', function() {
       this.style.transform = 'scale(1)';
     });
   }
 
-  // Add parallax effect for character container
+  // Add parallax effect for character container with throttling
   let ticking = false;
+  let scrollTimeout;
   
   function updateParallax() {
     const scrolled = window.pageYOffset;
-    const characterContainer = document.querySelector('.character-container');
     
-    if (characterContainer) {
+    if (cachedElements.characterContainer) {
       const rate = scrolled * -0.5;
-      characterContainer.style.transform = `translateY(${rate}px)`;
+      cachedElements.characterContainer.style.transform = `translateY(${rate}px)`;
     }
     
     ticking = false;
@@ -406,7 +418,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  window.addEventListener('scroll', requestTick, { passive: true });
+  // Throttled scroll event for better performance
+  window.addEventListener('scroll', function() {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(requestTick, 16); // 60fps throttling
+  }, { passive: true });
 
   // Add typing effect for section titles
   function typeWriter(element, text, speed = 100) {
@@ -436,13 +452,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 1000);
 
   // Enhanced 3D scroll indicator with interactive controls
-  const scrollIndicator = document.querySelector('.scroll-indicator');
-  if (scrollIndicator) {
+  if (cachedElements.scrollIndicator) {
     // Add floating class for enhanced 3D floating
-    scrollIndicator.classList.add('floating');
+    cachedElements.scrollIndicator.classList.add('floating');
     
     // Interactive 3D rotation on click
-    scrollIndicator.addEventListener('click', function() {
+    cachedElements.scrollIndicator.addEventListener('click', function() {
       // Toggle between floating and rotating animations
       if (this.classList.contains('rotating')) {
         this.classList.remove('rotating');
@@ -457,17 +472,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let scrollTimeout;
     window.addEventListener('scroll', function() {
       // Pause animations during scroll for better performance
-      scrollIndicator.style.animationPlayState = 'paused';
+      cachedElements.scrollIndicator.style.animationPlayState = 'paused';
       
       // Resume animations after scroll stops
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
-        scrollIndicator.style.animationPlayState = 'running';
+        cachedElements.scrollIndicator.style.animationPlayState = 'running';
       }, 150);
     }, { passive: true });
     
     // Add mouse movement tracking for dynamic 3D effect
-    scrollIndicator.addEventListener('mousemove', function(e) {
+    cachedElements.scrollIndicator.addEventListener('mousemove', function(e) {
       const rect = this.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -484,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Reset transform on mouse leave
-    scrollIndicator.addEventListener('mouseleave', function() {
+    cachedElements.scrollIndicator.addEventListener('mouseleave', function() {
       if (!this.classList.contains('rotating')) {
         this.style.transform = '';
       }
@@ -630,73 +645,7 @@ function initContactButton() {
   }
 }
 
-    // Mobile menu functionality across all pages
-    function initMobileMenu() {
-      // Hamburger removed; function is now a no-op
-      return;
-      console.log('=== INITIALIZING MOBILE MENU ===');
-      
-      const hamburgerBtn = document.getElementById('hamburgerBtn');
-      const mobileMenu = document.getElementById('mobileMenu');
-      
-      console.log('Hamburger button found:', hamburgerBtn);
-      console.log('Mobile menu found:', mobileMenu);
-      
-      if (hamburgerBtn && mobileMenu) {
-        console.log('✅ Both elements found, setting up event listeners...');
-        
-        // Add click event to hamburger button
-        hamburgerBtn.addEventListener('click', function(e) {
-          console.log('🍔 Hamburger button clicked!');
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Toggle mobile menu
-          const isVisible = mobileMenu.classList.contains('show');
-          console.log('Menu currently visible:', isVisible);
-          
-          if (isVisible) {
-            mobileMenu.classList.remove('show');
-            document.body.style.overflow = 'auto';
-            console.log('📱 Menu closed');
-          } else {
-            mobileMenu.classList.add('show');
-            document.body.style.overflow = 'hidden';
-            console.log('📱 Menu opened');
-          }
-          
-          console.log('Menu classes after toggle:', mobileMenu.className);
-          console.log('Menu display style:', window.getComputedStyle(mobileMenu).display);
-        });
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(e) {
-          if (!hamburgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
-            if (mobileMenu.classList.contains('show')) {
-              mobileMenu.classList.remove('show');
-              document.body.style.overflow = 'auto';
-              console.log('📱 Menu closed by outside click');
-            }
-          }
-        });
-        
-        // Close mobile menu with Escape key
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && mobileMenu.classList.contains('show')) {
-            mobileMenu.classList.remove('show');
-            document.body.style.overflow = 'auto';
-            console.log('📱 Menu closed by Escape key');
-          }
-        });
-        
-        console.log('✅ Mobile menu event listeners set up successfully!');
-        
-      } else {
-        console.error('❌ MOBILE MENU ERROR: Elements not found!');
-        console.error('Hamburger button:', hamburgerBtn);
-        console.error('Mobile menu:', mobileMenu);
-      }
-    }
+    // Mobile menu functionality removed - no longer needed
 
 // CV Modal Helper Functions
 function showCvPreview() {
@@ -719,14 +668,53 @@ function showCvError() {
   if (cvError) cvError.style.display = 'block';
 }
 
+// Retry CV loading function
+function retryCvLoad() {
+  const cvLoading = document.getElementById('cvLoading');
+  const cvIframe = document.getElementById('cvIframe');
+  const cvError = document.getElementById('cvError');
+  
+  if (cvLoading) cvLoading.style.display = 'block';
+  if (cvIframe) cvIframe.style.display = 'none';
+  if (cvError) cvError.style.display = 'none';
+  
+  // Reload the iframe
+  if (cvIframe) {
+    cvIframe.src = cvIframe.src;
+  }
+}
+
 // Initialize CV Modal with proper event handling
 function initCvModal() {
   const cvIframe = document.getElementById('cvIframe');
+  const cvLoading = document.getElementById('cvLoading');
+  const cvError = document.getElementById('cvError');
   
   if (cvIframe) {
+    // Reset states
+    if (cvLoading) cvLoading.style.display = 'block';
+    if (cvIframe) cvIframe.style.display = 'none';
+    if (cvError) cvError.style.display = 'none';
+    
+    // Set the correct path for the CV
+    cvIframe.src = '/assets/Michael%20cv.pdf';
+    
     // Add load event listener
     cvIframe.addEventListener('load', function() {
-      showCvPreview();
+      // Check if iframe actually loaded the PDF content
+      setTimeout(() => {
+        try {
+          // Try to access iframe content to verify PDF loaded
+          if (cvIframe.contentDocument || cvIframe.contentWindow) {
+            showCvPreview();
+          } else {
+            showCvError();
+          }
+        } catch (e) {
+          // Cross-origin or other error, but PDF might still be loading
+          showCvPreview();
+        }
+      }, 1500); // Increased timeout for PDF loading
     });
     
     // Add error event listener
@@ -736,11 +724,10 @@ function initCvModal() {
     
     // Set timeout for loading
     setTimeout(() => {
-      const cvLoading = document.getElementById('cvLoading');
       if (cvLoading && cvLoading.style.display !== 'none') {
         showCvError();
       }
-    }, 10000);
+    }, 10000); // Increased timeout
   }
 }
 
@@ -836,26 +823,8 @@ What would you like to know? 😊`
       this.hideTypingIndicator();
       this.addMessage({ type: 'ai', content: aiResponse });
     } catch (error) {
-      // Show error message instead of fallback
       this.hideTypingIndicator();
-      console.error('Groq API Error:', error);
-      
-      let errorMessage = 'Sorry, I encountered an error while processing your request.';
-      
-      if (error.message.includes('Failed to fetch')) {
-        errorMessage = 'Unable to connect to the AI service. Please check your internet connection or try again later.';
-      } else if (error.message.includes('API key not configured')) {
-        errorMessage = 'AI service is not properly configured. Please contact the developer.';
-      } else       if (error.message.includes('404')) {
-        errorMessage = 'AI service endpoint was not found. Please check if the service is properly deployed.';
-      } else if (error.message.includes('500')) {
-        errorMessage = 'AI service is temporarily unavailable. Please try again in a moment.';
-      }
-      
-      this.addMessage({ 
-        type: 'ai', 
-        content: `${errorMessage}\n\n💡 <strong>Note:</strong> The AI chat service is deployed on Vercel. If issues persist, please contact the developer.` 
-      });
+      this.showErrorMessage(error);
     }
   }
 
@@ -869,7 +838,12 @@ What would you like to know? 😊`
         body: JSON.stringify({ message: userInput }),
       });
 
+      // Graceful fallback in development or when API is unavailable
       if (!response.ok) {
+        // If 404 or network errors, return a placeholder so UI keeps working
+        if (response.status === 404) {
+          return 'The AI service is not available in this environment. Using a local placeholder reply. Ask me about the portfolio!';
+        }
         const errorData = await response.json().catch(() => ({}));
         throw new Error(`API request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
       }
@@ -883,7 +857,8 @@ What would you like to know? 😊`
       return data.response;
     } catch (err) {
       console.error('Groq API Error:', err);
-      throw err;
+      // Network or other failures: provide a friendly fallback
+      return 'I couldn\'t reach the AI service right now. Here to help with info about this portfolio!';
     }
   }
 
@@ -919,9 +894,16 @@ What would you like to know? 😊`
     const avatar = message.type === 'user' ? '👤' : '🤖';
     const avatarClass = message.type === 'user' ? 'user' : 'ai';
     
+    const safeContent = (message.content || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
     messageDiv.innerHTML = `
       <div class="ai-message-avatar ${avatarClass}">${avatar}</div>
-      <div class="ai-message-content">${message.content}</div>
+      <div class="ai-message-content">${safeContent}</div>
     `;
     
     this.messagesContainer.appendChild(messageDiv);
@@ -931,6 +913,77 @@ What would you like to know? 😊`
   scrollToBottom() {
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
   }
+
+  showErrorMessage(error) {
+    let errorMessage = 'Sorry, I encountered an error while processing your request.';
+    
+    if (error.message.includes('Failed to fetch')) {
+      errorMessage = 'Unable to connect to the AI service. Please check your internet connection or try again later.';
+    } else if (error.message.includes('API key not configured')) {
+      errorMessage = 'AI service is not properly configured. Please contact the developer.';
+    } else if (error.message.includes('404')) {
+      errorMessage = 'AI service endpoint was not found. Please check if the service is properly deployed.';
+    } else if (error.message.includes('500')) {
+      errorMessage = 'AI service is temporarily unavailable. Please try again in a moment.';
+    }
+    
+    this.addMessage({ 
+      type: 'ai', 
+      content: `${errorMessage}\n\n💡 <strong>Note:</strong> The AI chat service is deployed on Vercel. If issues persist, please contact the developer.` 
+    });
+  }
+}
+
+// Cube Game Button Functionality
+function initCubeGameButton() {
+  const cubeGameFab = document.getElementById('cubeGameFab');
+  
+  if (cubeGameFab) {
+    cubeGameFab.addEventListener('click', () => {
+      // Open the cube game in a new tab
+      window.open('https://bsehovac.github.io/the-cube/', '_blank');
+    });
+    
+    // Add hover effect
+    cubeGameFab.addEventListener('mouseenter', () => {
+      cubeGameFab.style.transform = 'translateY(-3px) scale(1.1)';
+    });
+    
+    cubeGameFab.addEventListener('mouseleave', () => {
+      cubeGameFab.style.transform = 'translateY(0) scale(1)';
+    });
+  }
+}
+
+// Orrery Button Functionality
+function initOrreryButton() {
+  const orreryFab = document.getElementById('orreryFab');
+  
+  if (orreryFab) {
+    orreryFab.addEventListener('click', () => {
+      if (window.orrerySystem) {
+        if (window.orrerySystem.isOrreryActive && window.orrerySystem.isOrreryMode) {
+          // Currently in interactive mode, exit to background mode
+          window.orrerySystem.exitOrreryMode();
+        } else if (window.orrerySystem.isOrreryActive && !window.orrerySystem.isOrreryMode) {
+          // Currently in background mode, enter interactive mode
+          window.orrerySystem.enterOrreryMode();
+        } else {
+          // Orrery not active, start it
+          window.orrerySystem.enterOrreryMode();
+        }
+      }
+    });
+    
+    // Add hover effect
+    orreryFab.addEventListener('mouseenter', () => {
+      orreryFab.style.transform = 'translateY(-3px) scale(1.1)';
+    });
+    
+    orreryFab.addEventListener('mouseleave', () => {
+      orreryFab.style.transform = 'translateY(0) scale(1)';
+    });
+  }
 }
 
 // Initialize AI Chat when DOM is loaded
@@ -938,18 +991,34 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize existing functionality
   initNavigationDropdown();
   initContactButton();
-  initMobileMenu();
   
-  // Initialize CV Modal
-  initCvModal();
+  // CV Modal will be initialized when the button is clicked
   
   // Initialize AI Chat
   new PortfolioAIAssistant();
   
+  // Initialize Cube Game Button
+  initCubeGameButton();
+  
+  // Initialize Orrery Button
+  initOrreryButton();
+  
   // Initialize Scroll Progress Bar
   initScrollProgress();
   
-  // Test wiring removed
+  // Make retry function globally available
+  window.retryCvLoad = retryCvLoad;
+  
+  // Initialize Orrery System after Three.js background is ready
+  setTimeout(() => {
+    if (window.threeBackground) {
+      import('./orrery.js').then(({ createOrrery }) => {
+        window.orrerySystem = createOrrery(window.threeBackground);
+      }).catch(error => {
+        console.error('Failed to load orrery system:', error);
+      });
+    }
+  }, 2000); // Wait for Three.js background to initialize
 });
 
 // Scroll Progress Bar Functionality

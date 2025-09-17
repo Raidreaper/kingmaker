@@ -8,5 +8,15 @@
     "api/chat.js": {
       "runtime": "nodejs18.x"
     }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "GROQ_API_KEY": "@groq_api_key"
   }
 }

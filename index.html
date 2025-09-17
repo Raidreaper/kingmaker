@@ -26,8 +26,37 @@
     <title>Obaniwa Michael - Full-Stack Developer Portfolio | React Native & Flutter Expert</title>
   </head>
   <body>
-    <!-- Particles Background -->
-    <div id="particles-js"></div>
+    <!-- Three.js Background -->
+    <div id="particles-js">
+      <div id="loading-indicator" style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 18px;
+        z-index: 10;
+        text-align: center;
+      ">
+        <div style="
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(255,255,255,0.3);
+          border-top: 3px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 10px;
+        "></div>
+        Loading 3D Background...
+      </div>
+    </div>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
     
     <!-- Page Overlay -->
     <div class="page-overlay"></div>
@@ -70,25 +99,25 @@
           <div class="character">
             <div class="slideshow-container">
               <div class="slide" data-animation="slideInFromRight">
-                <img src="/assets/0bc01043-fdda-425b-83dc-b9a7b8c767cf-removebg-preview (1).png" alt="Character 2" class="character-image">
+                <img src="/assets/0bc01043-fdda-425b-83dc-b9a7b8c767cf-removebg-preview%20(1).png" alt="Character 2" class="character-image" loading="lazy">
               </div>
               <div class="slide" data-animation="slideInFromLeft">
-                <img src="/assets/3c8dd89c-93cc-4e49-b48b-e44e2057b8b0-removebg-preview.png" alt="Character 3" class="character-image">
+                <img src="/assets/3c8dd89c-93cc-4e49-b48b-e44e2057b8b0-removebg-preview.png" alt="Character 3" class="character-image" loading="lazy">
               </div>
               <div class="slide" data-animation="zoomInRotate">
-                <img src="/assets/6d2607f5-6d33-4338-8797-95504a0a2a42-removebg-preview.png" alt="Character 4" class="character-image">
+                <img src="/assets/6d2607f5-6d33-4338-8797-95504a0a2a42-removebg-preview.png" alt="Character 4" class="character-image" loading="lazy">
               </div>
               <div class="slide" data-animation="bounceIn">
-                <img src="/assets/7f2252e4-eefc-43ab-96d7-867a5cb6f51e-removebg-preview.png" alt="Character 5" class="character-image">
+                <img src="/assets/7f2252e4-eefc-43ab-96d7-867a5cb6f51e-removebg-preview.png" alt="Character 5" class="character-image" loading="lazy">
               </div>
               <div class="slide" data-animation="flipInX">
-                <img src="/assets/131adf74-1fb8-47e4-ab84-313df10c685b-removebg-preview (1).png" alt="Character 6" class="character-image">
+                <img src="/assets/131adf74-1fb8-47e4-ab84-313df10c685b-removebg-preview%20(1).png" alt="Character 6" class="character-image" loading="lazy">
               </div>
               <div class="slide" data-animation="fadeInUp">
-                <img src="/assets/131adf74-1fb8-47e4-ab84-313df10c685b-removebg-preview.png" alt="Character 7" class="character-image">
+                <img src="/assets/131adf74-1fb8-47e4-ab84-313df10c685b-removebg-preview.png" alt="Character 7" class="character-image" loading="lazy">
               </div>
               <div class="slide" data-animation="slideInFromTop">
-                <img src="/assets/Jujutsu_Kaisen-removebg-preview.png" alt="Character 8" class="character-image">
+                <img src="/assets/Jujutsu_Kaisen-removebg-preview.png" alt="Character 8" class="character-image" loading="lazy">
               </div>
             </div>
             <div class="scroll-indicator"></div>
@@ -109,6 +138,16 @@
         <div class="ai-chat-fab" id="aiChatFab">
           <div class="ai-chat-icon">🤖</div>
           <div class="ai-chat-label">AI Assistant</div>
+        </div>
+
+        <!-- Cube Game Button - Mini Floating Button -->
+        <div class="cube-game-fab" id="cubeGameFab" title="Play Cube Game">
+          <div class="cube-game-icon">🎲</div>
+        </div>
+
+        <!-- Orrery Button - Interactive Solar System -->
+        <div class="orrery-fab" id="orreryFab" title="Interactive Solar System">
+          <div class="orrery-icon">🪐</div>
         </div>
 
         <!-- AI Chat Modal -->
@@ -175,11 +214,12 @@
                <p>Please wait while CV is loading.</p>
              </div>
              <iframe id="cvIframe"
-               src="/assets/Michael cv.pdf"
+               src="/assets/Michael%20cv.pdf"
                width="100%"
                height="500px"
                frameborder="0"
-               style="display: none;">
+               style="display: none;"
+               type="application/pdf">
              </iframe>
              <div id="cvError" style="display: none; text-align: center; padding: 2rem;">
                <div class="cv-error-icon">⚠️</div>
@@ -190,6 +230,14 @@
                  <li>Your browser doesn't support PDF preview</li>
                  <li>There was a network error</li>
                </ul>
+               <div style="margin: 1rem 0;">
+                <a href="/assets/Michael%20cv.pdf" target="_blank" class="btn btn-primary" style="margin-right: 10px;">
+                   Open CV in New Tab
+                 </a>
+                 <button class="btn btn-secondary" onclick="retryCvLoad()">
+                   Retry Loading
+                 </button>
+               </div>
                <p><strong>You can still download the CV using the buttons below.</strong></p>
              </div>
            </div>
@@ -234,141 +282,7 @@
        </div>
      </div>
     <script src="./main.js" type="module"></script>
-    <script>
-      // Enhanced Slideshow functionality with image preloading
-      class AdvancedSlideshow {
-        constructor() {
-          this.currentSlide = 0;
-          this.slides = document.querySelectorAll('.slide');
-          this.totalSlides = this.slides.length;
-          this.interval = null;
-          this.isTransitioning = false;
-          
-          this.init();
-        }
-        
-        init() {
-          // Preload all images first
-          this.preloadImages().then(() => {
-            this.startSlideshow();
-            this.setupEventListeners();
-          });
-        }
-        
-        preloadImages() {
-          const imagePromises = Array.from(this.slides).map(slide => {
-            const img = slide.querySelector('img');
-            if (img && img.src) {
-              return new Promise((resolve, reject) => {
-                const tempImg = new Image();
-                tempImg.onload = () => resolve();
-                tempImg.onerror = () => reject();
-                tempImg.src = img.src;
-              });
-            }
-            return Promise.resolve();
-          });
-          
-          return Promise.all(imagePromises);
-        }
-        
-        startSlideshow() {
-          this.interval = setInterval(() => {
-            if (!this.isTransitioning) {
-              this.nextSlide();
-            }
-          }, 4500);
-        }
-        
-        nextSlide() {
-          if (this.isTransitioning) return;
-          
-          this.isTransitioning = true;
-          
-          // Remove active class from current slide
-          this.slides[this.currentSlide].classList.remove('active');
-          
-          // Move to next slide
-          this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
-          
-          // Add active class to new slide
-          this.slides[this.currentSlide].classList.add('active');
-          
-          // Reset transition flag after animation completes
-          setTimeout(() => {
-            this.isTransitioning = false;
-          }, 800);
-        }
-        
-        setupEventListeners() {
-          // Pause slideshow on hover
-          const slideshowContainer = document.querySelector('.slideshow-container');
-          if (slideshowContainer) {
-            slideshowContainer.addEventListener('mouseenter', () => {
-              if (this.interval) {
-                clearInterval(this.interval);
-              }
-            });
-            
-            slideshowContainer.addEventListener('mouseleave', () => {
-              this.startSlideshow();
-            });
-          }
-          
-          // Touch events for mobile
-          let touchStartX = 0;
-          let touchEndX = 0;
-          
-          slideshowContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-          }, { passive: true });
-          
-          slideshowContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            this.handleSwipe();
-          }, { passive: true });
-        }
-        
-        handleSwipe() {
-          const swipeThreshold = 50;
-          const diff = touchStartX - touchEndX;
-          
-          if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0) {
-              // Swipe left - next slide
-              this.nextSlide();
-            } else {
-              // Swipe right - previous slide
-              this.previousSlide();
-            }
-          }
-        }
-        
-        previousSlide() {
-          if (this.isTransitioning) return;
-          
-          this.isTransitioning = true;
-          
-          // Remove active class from current slide
-          this.slides[this.currentSlide].classList.remove('active');
-          
-          // Move to previous slide
-          this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
-          
-          // Add active class to new slide
-          this.slides[this.currentSlide].classList.add('active');
-          
-          // Reset transition flag after animation completes
-          setTimeout(() => {
-            this.isTransitioning = false;
-          }, 800);
-        }
-      }
-      
-      // Initialize slideshow when DOM is loaded
-      document.addEventListener('DOMContentLoaded', () => {
-        new AdvancedSlideshow();
-      });
-    </script>
+    <script src="./slideshow.js" type="module"></script>
+    <script src="./three-background.js" type="module"></script>
   </body>
 </html>

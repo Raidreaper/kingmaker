@@ -2,295 +2,263 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/m-favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="style.css">
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Obaniwa Michael - View my portfolio projects including mobile apps, web applications, and innovative solutions built with React Native, Flutter, and modern web technologies.">
-    <meta name="keywords" content="Portfolio Projects, React Native Apps, Flutter Apps, Web Applications, Mobile Development, Full-Stack Projects, Obaniwa Michael">
-    <meta name="author" content="Obaniwa Michael">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Obaniwa Michael - Portfolio Projects">
-    <meta property="og:description" content="View my portfolio projects including mobile apps, web applications, and innovative solutions built with React Native, Flutter, and modern web technologies.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kingmaker.infy.uk/projects">
-    <meta property="og:image" content="https://kingmaker.infy.uk/assets/m1.png">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Obaniwa Michael - Portfolio Projects">
-    <meta name="twitter:description" content="View my portfolio projects including mobile apps, web applications, and innovative solutions.">
-    
-    <title>Portfolio Projects - Obaniwa Michael | Mobile & Web Development</title>
+    <title>Projects • Obaniwa Michael</title>
+    <link rel="preload" as="image" href="/assets/m1.png">
+    <style>
+      /* Page-specific styles (kept minimal and scoped) */
+      :root {
+        --snap-gap: 10vh;
+      }
+      /* Use same 3D background as index (handled by three-background.js) */
+      .projects-snap-container {
+        scroll-snap-type: y mandatory;
+        overflow-y: auto;
+        height: 100vh;
+      }
+      .project-panel {
+        scroll-snap-align: start;
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+        padding: 10vh 6vw;
+        position: relative;
+      }
+      .project-panel:nth-child(odd) {
+        grid-template-columns: 1.1fr .9fr;
+      }
+      .project-info h2 {
+        margin: 0 0 .6rem 0;
+        font-size: 2rem;
+        letter-spacing: .5px;
+      }
+      .project-info p { opacity: .9; }
+      .tech-tags { margin-top: .75rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+      .tech-tags .tag { padding: .35rem .6rem; border: 1px solid rgba(255,255,255,.15); border-radius: 999px; font-size: .85rem; opacity: .9; }
+      .project-links { margin-top: 1rem; display: flex; gap: .75rem; }
+      .project-links a { text-decoration: none; padding: .6rem .9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); }
+      .project-media {
+        position: relative;
+        perspective: 1200px;
+      }
+      .project-card {
+        background: rgba(20,20,30,.45);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 16px;
+        overflow: hidden;
+        transform: rotateX(6deg) rotateY(-6deg);
+        box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      }
+      .project-card img { display:block; width:100%; height:auto; }
+      .panel-accent {
+        position: absolute; inset: -2px; border-radius: 18px;
+        background: radial-gradient(400px 200px at var(--mx,70%) var(--my,30%), rgba(120,80,255,.25), transparent 60%);
+        pointer-events: none;
+      }
+      .snap-indicator { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: .85rem; opacity: .7; }
+      @media (max-width: 960px){
+        .project-panel { grid-template-columns: 1fr; gap: 1.25rem; padding: 8vh 5vw; }
+        .project-card { transform: none; }
+      }
+    </style>
   </head>
-  <body>
-    <!-- Particles Background -->
-    <div id="particles-js"></div>
-    
-    <!-- Page Overlay -->
+  <body class="projects-page">
+    <!-- Three background and site shell stay consistent -->
+    <!-- Three.js Background (same structure as index.html) -->
+    <div id="particles-js">
+      <div id="loading-indicator" style="
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        color: white; font-size: 18px; z-index: 10; text-align: center;">
+        <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;"></div>
+        Loading 3D Background...
+      </div>
+    </div>
+    <style>
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
     <div class="page-overlay"></div>
-    
     <div id="app">
-      <!-- Header -->
       <header class="header">
         <div class="logo">
-          <div class="logo-icon">
-            <span>R</span><span>a</span><span>i</span><span>d</span><span>r</span><span>e</span><span>a</span><span>p</span><span>e</span><span>r</span>
-          </div>
+          <div class="logo-icon"><span>R</span><span>a</span><span>i</span><span>d</span><span>r</span><span>e</span><span>a</span><span>p</span><span>e</span><span>r</span></div>
         </div>
         <nav class="navigation">
           <a href="index.html" class="nav-link">Home</a>
-           <button class="nav-link contact-btn" id="headerContactBtn">
-             Contact Me
-           </button>
+          <button class="nav-link contact-btn" id="headerContactBtn">Contact Me</button>
          </nav>
-        <div class="header-actions">
-          <button class="icon-btn search-btn">🔍</button>
-        </div>
+        <div class="header-actions"><button class="icon-btn search-btn">🔍</button></div>
       </header>
 
-      <!-- Main Content -->
       <main class="main-content">
         <section class="projects-section">
-          <h1 class="section-title">My Projects</h1>
-          <p class="section-text">
-            Here's a showcase of my recent work, demonstrating my expertise in full-stack development, mobile apps, and modern web technologies.
-          </p>
-          
-          <div class="projects-grid">
-            <!-- Project 1: Portfolio -->
-                         <div class="project-card">
-              <div class="project-image">
-                <img src="/assets/m1.png" alt="Portfolio Project" class="project-img">
-                <div class="project-overlay">
-                  <div class="project-links">
-                    <a href="https://kingmaker.infy.uk" target="_blank" class="project-link">
-                      <span class="link-icon">🌐</span>
-                      Live Demo
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="project-content">
-                <h3 class="project-title">Personal Portfolio</h3>
-                <p class="project-description">
-                  A modern, responsive portfolio website showcasing my skills and projects. Features glass morphism design, particle animations, and interactive elements.
-                </p>
-                <div class="project-tech">
-                  <span class="tech-tag">HTML5</span>
-                  <span class="tech-tag">CSS3</span>
-                  <span class="tech-tag">JavaScript</span>
-                  <span class="tech-tag">Particles.js</span>
-                  <span class="tech-tag">Glass Morphism</span>
-                </div>
-                <div class="project-features">
-                  <span class="feature">Responsive Design</span>
-                  <span class="feature">Interactive Animations</span>
-                  <span class="feature">Modern UI/UX</span>
-                </div>
-              </div>
-            </div>
+          <h1 class="section-title">Projects</h1>
+          <p class="section-text">A curated selection of work across web and mobile. Scroll to explore.</p>
 
-            <!-- Project 2: Lover's Code -->
-                         <div class="project-card">
-              <div class="project-image">
-                <img src="/assets/m2.png" alt="Lover's Code Project" class="project-img">
-                <div class="project-overlay">
-                  <div class="project-links">
-                    <a href="https://Lover-livid.vercel.app" target="_blank" class="project-link">
-                      <span class="link-icon">🌐</span>
-                      Live Demo
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="project-content">
-                <h3 class="project-title">Lover's Code</h3>
-                <p class="project-description">
-                  A digital platform for meaningful connections, featuring AI companionship, matchmaking, and solo journey experiences. Built with modern web technologies.
-                </p>
-                <div class="project-tech">
-                  <span class="tech-tag">React</span>
-                  <span class="tech-tag">Next.js</span>
-                  <span class="tech-tag">TypeScript</span>
-                  <span class="tech-tag">Tailwind CSS</span>
-                  <span class="tech-tag">AI Integration</span>
-                </div>
-                <div class="project-features">
-                  <span class="feature">AI Companionship</span>
-                  <span class="feature">Matchmaking System</span>
-                  <span class="feature">Glass Morphism UI</span>
-                </div>
-              </div>
-            </div>
+          <!-- Filter / Tags -->
+          <div class="project-filters" style="display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 1.5rem 0;">
+            <button class="btn btn-secondary" data-filter="all">All</button>
+            <button class="btn btn-secondary" data-filter="javascript">JavaScript</button>
+            <button class="btn btn-secondary" data-filter="threejs">Three.js</button>
+            <button class="btn btn-secondary" data-filter="react">React</button>
+            <button class="btn btn-secondary" data-filter="nextjs">Next.js</button>
+            <button class="btn btn-secondary" data-filter="typescript">TypeScript</button>
+            <button class="btn btn-secondary" data-filter="tailwind">Tailwind</button>
+            <button class="btn btn-secondary" data-filter="nodejs">Node.js</button>
+            <button class="btn btn-secondary" data-filter="express">Express</button>
+            <button class="btn btn-secondary" data-filter="mongodb">MongoDB</button>
+            <button class="btn btn-secondary" data-filter="python">Python</button>
+            <button class="btn btn-secondary" data-filter="django">Django</button>
+            <button class="btn btn-secondary" data-filter="postgresql">PostgreSQL</button>
+            <button class="btn btn-secondary" data-filter="seo">SEO</button>
+            <button class="btn btn-secondary" data-filter="vercel">Vercel</button>
+          </div>
 
-            <!-- Project 3: Tife's Gourmet -->
-                         <div class="project-card">
-              <div class="project-image">
-                <img src="/assets/m3.png" alt="Tife's Gourmet Project" class="project-img">
-                <div class="project-overlay">
+          <div class="projects-snap-container" id="projectsSnap">
+            <!-- Panel 1: Portfolio -->
+            <article class="project-panel" data-accent data-tags="html5,css3,javascript,threejs">
+              <div class="project-info">
+                <h2>Personal Portfolio</h2>
+                <p>Modern, responsive portfolio with glass morphism, 3D background, and interactive micro‑interactions.</p>
+                <div class="tech-tags">
+                  <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">Three.js</span>
+                </div>
                   <div class="project-links">
-                    <a href="https://Tife.lovestoblog.com" target="_blank" class="project-link">
-                      <span class="link-icon">🌐</span>
-                      Live Demo
-                    </a>
-                  </div>
+                  <a href="https://kingmaker.infy.uk" target="_blank">Live Demo</a>
                 </div>
               </div>
-              <div class="project-content">
-                <h3 class="project-title">Tife's Gourmet</h3>
-                <p class="project-description">
-                  A comprehensive food business website featuring bakery, smoothie bar, and healthy food restaurant services. Includes e-commerce functionality and menu management.
-                </p>
-                <div class="project-tech">
-                  <span class="tech-tag">React</span>
-                  <span class="tech-tag">Node.js</span>
-                  <span class="tech-tag">MongoDB</span>
-                  <span class="tech-tag">Express.js</span>
-                  <span class="tech-tag">E-commerce</span>
-                </div>
-                <div class="project-features">
-                  <span class="feature">Online Ordering</span>
-                  <span class="feature">Menu Management</span>
-                  <span class="feature">Payment Integration</span>
-                </div>
+              <div class="project-media">
+                <div class="project-card"><img src="/assets/m1.png" alt="Personal Portfolio"></div>
+                <div class="panel-accent"></div>
               </div>
-            </div>
+            </article>
 
-            <!-- Project 4: Blogly -->
-                         <div class="project-card">
-              <div class="project-image">
-                <img src="/assets/m4.png" alt="Blogly Project" class="project-img">
-                <div class="project-overlay">
-                  <div class="project-links">
-                    <a href="https://mi1.figureswork.com" target="_blank" class="project-link">
-                      <span class="link-icon">🌐</span>
-                      Live Demo
-                    </a>
-                  </div>
+            <!-- Panel 2: Lover's Code -->
+            <article class="project-panel" data-accent data-tags="react,nextjs,typescript,tailwind">
+              <div class="project-info">
+                <h2>Lover's Code</h2>
+                <p>Platform for meaningful connections: AI companionship, matchmaking, and solo journeys.</p>
+                <div class="tech-tags">
+                  <span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://Lover-livid.vercel.app" target="_blank">Live Demo</a>
                 </div>
               </div>
-              <div class="project-content">
-                <h3 class="project-title">Blogly</h3>
-                <p class="project-description">
-                  An AI-powered blogging platform that enhances writing capabilities with intelligent assistance. Features user authentication, content management, and AI writing tools.
-                </p>
-                <div class="project-tech">
-                  <span class="tech-tag">React</span>
-                  <span class="tech-tag">Python</span>
-                  <span class="tech-tag">OpenAI API</span>
-                  <span class="tech-tag">Django</span>
-                  <span class="tech-tag">PostgreSQL</span>
-                </div>
-                <div class="project-features">
-                  <span class="feature">AI Writing Assistant</span>
-                  <span class="feature">User Management</span>
-                  <span class="feature">Content Analytics</span>
-                </div>
+              <div class="project-media">
+                <div class="project-card"><img src="/assets/m2.png" alt="Lover's Code"></div>
+                <div class="panel-accent"></div>
               </div>
-            </div>
+            </article>
 
-            <!-- Project 5: King of CMS -->
-                         <div class="project-card">
-              <div class="project-image">
-                <img src="/assets/m5.png" alt="King of CMS Project" class="project-img">
-                <div class="project-overlay">
-                  <div class="project-links">
-                    <a href="https://kingofcms.net" target="_blank" class="project-link">
-                      <span class="link-icon">🌐</span>
-                      Live Demo
-                    </a>
-                  </div>
+            <!-- Panel 3: Tife's Gourmet -->
+            <article class="project-panel" data-accent data-tags="react,nodejs,express,mongodb">
+              <div class="project-info">
+                <h2>Tife's Gourmet</h2>
+                <p>Food business website covering bakery, smoothie bar, and healthy options with ordering.</p>
+                <div class="tech-tags">
+                  <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">MongoDB</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://Tife.lovestoblog.com" target="_blank">Live Demo</a>
                 </div>
               </div>
-              <div class="project-content">
-                <h3 class="project-title">King of CMS Consulting</h3>
-                <p class="project-description">
-                  A professional consulting website for IT solutions, featuring case studies, blog content, and consultation booking. Specializes in software development and AI solutions.
-                </p>
-                <div class="project-tech">
-                  <span class="tech-tag">React</span>
-                  <span class="tech-tag">Node.js</span>
-                  <span class="tech-tag">MongoDB</span>
-                  <span class="tech-tag">Express.js</span>
-                  <span class="tech-tag">Booking System</span>
-                </div>
-                <div class="project-features">
-                  <span class="feature">Consultation Booking</span>
-                  <span class="feature">Case Studies</span>
-                  <span class="feature">Blog Management</span>
-                </div>
+              <div class="project-media">
+                <div class="project-card"><img src="/assets/m3.png" alt="Tife's Gourmet"></div>
+                <div class="panel-accent"></div>
               </div>
-            </div>
+            </article>
 
-            <!-- Project 6: MindSpace AI -->
-            <div class="project-card">
-              <div class="project-image">
-                <img src="/assets/MindSpace AI - Mental Wellness & Productivity Coach - Google Chrome 8_27_2025 12_13_26 AM.png" alt="MindSpace AI Project" class="project-img">
-                <div class="project-overlay">
-                  <div class="project-links">
-                    <a href="https://mindspace-ai.vercel.app/auth" target="_blank" class="project-link">
-                      <span class="link-icon">🌐</span>
-                      Live Demo
-                    </a>
-                  </div>
+            <!-- Panel 4: Blogly -->
+            <article class="project-panel" data-accent data-tags="react,python,django,postgresql">
+              <div class="project-info">
+                <h2>Blogly</h2>
+                <p>AI‑assisted blogging platform with authentication, CMS, and intelligent writing support.</p>
+                <div class="tech-tags">
+                  <span class="tag">React</span><span class="tag">Python</span><span class="tag">Django</span><span class="tag">PostgreSQL</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://mi1.figureswork.com" target="_blank">Live Demo</a>
                 </div>
               </div>
-              <div class="project-content">
-                <h3 class="project-title">MindSpace AI</h3>
-                <p class="project-description">
-                  A mental wellness platform powered by AI, featuring Google authentication, personalized mental health insights, and AI-driven therapeutic conversations. Built with modern web technologies and deployed on Vercel.
-                </p>
-                <div class="project-tech">
-                  <span class="tech-tag">React</span>
-                  <span class="tech-tag">Next.js</span>
-                  <span class="tech-tag">TypeScript</span>
-                  <span class="tech-tag">Tailwind CSS</span>
-                  <span class="tech-tag">Google Auth</span>
-                  <span class="tech-tag">AI Integration</span>
-                  <span class="tech-tag">Vercel</span>
+              <div class="project-media">
+                <div class="project-card"><img src="/assets/m4.png" alt="Blogly"></div>
+                <div class="panel-accent"></div>
+              </div>
+            </article>
+
+            <!-- Panel 5: King of CMS -->
+            <article class="project-panel" data-accent data-tags="react,nodejs,mongodb,express">
+              <div class="project-info">
+                <h2>King of CMS Consulting</h2>
+                <p>Consulting site featuring case studies, blog, and consultation booking.</p>
+                <div class="tech-tags">
+                  <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">MongoDB</span><span class="tag">Express</span>
                 </div>
-                <div class="project-features">
-                  <span class="feature">AI Mental Health Support</span>
-                  <span class="feature">Google Authentication</span>
-                  <span class="feature">Personalized Insights</span>
-                  <span class="feature">Responsive Design</span>
+                <div class="project-links">
+                  <a href="https://kingofcms.net" target="_blank">Live Demo</a>
                 </div>
               </div>
+              <div class="project-media">
+                <div class="project-card"><img src="/assets/m5.png" alt="King of CMS"></div>
+                <div class="panel-accent"></div>
+              </div>
+            </article>
+
+            <!-- Panel 6: MindSpace AI -->
+            <article class="project-panel" data-accent data-tags="nextjs,typescript,tailwind,vercel">
+              <div class="project-info">
+                <h2>MindSpace AI</h2>
+                <p>Mental wellness assistant with Google auth and AI‑driven guidance, deployed on Vercel.</p>
+                <div class="tech-tags">
+                  <span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span><span class="tag">Vercel</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://mindspace-ai.vercel.app/auth" target="_blank">Live Demo</a>
+                </div>
+              </div>
+              <div class="project-media">
+                <div class="project-card"><img src="/assets/MindSpace AI - Mental Wellness & Productivity Coach - Google Chrome 8_27_2025 12_13_26 AM.png" alt="MindSpace AI"></div>
+                <div class="panel-accent"></div>
+              </div>
+            </article>
+
+            <!-- Panel 7: Springbase School -->
+            <article class="project-panel" data-accent data-tags="html5,css3,javascript,seo">
+              <div class="project-info">
+                <h2>Springbase School</h2>
+                <p>Clean, accessible school website highlighting programs, facilities, admissions and student life.</p>
+                <div class="tech-tags">
+                  <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">SEO</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://www.springbase.com.ng/" target="_blank">Live Site</a>
+                </div>
+              </div>
+              <div class="project-media">
+                <div class="project-card"><img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fwww.springbase.com.ng%2F?w=1200" alt="Springbase Website"></div>
+                <div class="panel-accent"></div>
             </div>
+            </article>
           </div>
           
-          <!-- Progress Bar -->
-          <div class="scroll-progress-container">
-            <div class="scroll-progress-bar" id="scrollProgressBar"></div>
-          </div>
+          <div class="snap-indicator">Scroll • • •</div>
           
-          <div class="cta-buttons">
+          <div class="cta-buttons" style="margin-top: 2rem;">
             <a href="index.html" class="btn btn-secondary">Back to Home</a>
             <a href="skills.html" class="btn btn-primary">View Skills</a>
           </div>
         </section>
       </main>
 
-      <!-- Footer -->
       <footer class="footer">
-        <div class="copyright">
-          @2025 Obaniwa Michael all rights reserved
-        </div>
+        <div class="copyright">@2025 Obaniwa Michael all rights reserved</div>
         <div class="social-links">
-          <a href="https://wa.me/08071897468?text=Hello%20Obaniwa%20Michael!%20I%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you." target="_blank" class="social-icon whatsapp" title="WhatsApp">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-            </svg>
-          </a>
-          <a href="https://github.com/Raidreaper" target="_blank" class="social-icon github" title="GitHub">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 4.624-5.479 4.869.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-          </a>
+          <a href="https://wa.me/08071897468?text=Hello%20Obaniwa%20Michael!%20I%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you." target="_blank" class="social-icon whatsapp" title="WhatsApp"></a>
+          <a href="https://github.com/Raidreaper" target="_blank" class="social-icon github" title="GitHub"></a>
         </div>
       </footer>
       
@@ -300,7 +268,7 @@
         <div class="ai-chat-label">AI Assistant</div>
       </div>
 
-      <!-- AI Chat Modal -->
+      <!-- AI Chat Modal (full markup to match main.js) -->
       <div class="ai-chat-modal" id="aiChatModal">
         <div class="ai-chat-header">
           <div class="ai-chat-title">
@@ -309,62 +277,63 @@
           </div>
           <button class="ai-chat-close" id="aiChatClose">×</button>
         </div>
-        
-        <div class="ai-chat-messages" id="aiChatMessages">
-          <!-- Welcome message will be added here -->
-        </div>
-        
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
         <div class="ai-chat-input-container">
           <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask me about this portfolio...">
           <button class="ai-chat-send" id="aiChatSend">➤</button>
         </div>
       </div>
-
-      <!-- AI Chat Overlay -->
       <div class="ai-chat-overlay" id="aiChatOverlay"></div>
     </div>
 
-    <!-- Contact Modal -->
-    <div id="contactModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Contact Me</h2>
-          <button class="close-btn" id="closeContactModal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="contact-options">
-            <div class="contact-option">
-              <div class="contact-icon">📧</div>
-              <div class="contact-details">
-                <h3>Email</h3>
-                <p>Obaniwamichael17@gmail.com</p>
-                <a href="mailto:Obaniwamichael17@gmail.com?subject=Portfolio%20Inquiry&body=Hello%20Obaniwa%20Michael,%0A%0AI%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you.%0A%0ABest%20regards," class="btn btn-primary">Send Email</a>
-              </div>
-            </div>
-            <div class="contact-option">
-              <div class="contact-icon">📞</div>
-              <div class="contact-details">
-                <h3>Phone</h3>
-                <p>08071897468</p>
-                <a href="tel:08071897468" class="btn btn-primary">Call Now</a>
-              </div>
-            </div>
-            <div class="contact-option">
-              <div class="contact-icon">💬</div>
-              <div class="contact-details">
-                <h3>WhatsApp</h3>
-                <p>Start a conversation</p>
-                <a href="https://wa.me/08071897468?text=Hello%20Obaniwa%20Michael!%20I%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you." target="_blank" class="btn btn-primary">Chat on WhatsApp</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" id="closeContactModalBtn">Close</button>
-        </div>
-      </div>
-    </div>
-
     <script src="main.js" type="module"></script>
+    <script src="three-background.js" type="module"></script>
+    <script>
+      // Parallax accent follows mouse per panel
+      document.querySelectorAll('[data-accent]').forEach(panel => {
+        const accent = panel.querySelector('.panel-accent');
+        panel.addEventListener('mousemove', (e) => {
+          const r = panel.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width * 100;
+          const y = (e.clientY - r.top) / r.height * 100;
+          accent && accent.style.setProperty('--mx', x + '%');
+          accent && accent.style.setProperty('--my', y + '%');
+        });
+      });
+
+      // Tag filtering + deep-linking (?tag=react)
+      (function(){
+        const container = document.getElementById('projectsSnap');
+        const panels = Array.from(container.querySelectorAll('.project-panel'));
+        const buttons = Array.from(document.querySelectorAll('.project-filters [data-filter]'));
+
+        function applyFilter(tag){
+          const t = (tag||'all').toLowerCase();
+          panels.forEach(p => {
+            const tags = (p.getAttribute('data-tags')||'').split(',');
+            const show = t==='all' || tags.includes(t);
+            p.style.display = show ? '' : 'none';
+          });
+          // reset scroll to first visible panel
+          const first = panels.find(p => p.style.display !== 'none');
+          if (first) first.scrollIntoView({ behavior:'smooth', block:'start'});
+        }
+
+        // Button clicks
+        buttons.forEach(b => b.addEventListener('click', () => {
+          const tag = b.getAttribute('data-filter');
+          const url = new URL(location.href);
+          url.searchParams.set('tag', tag);
+          history.replaceState(null, '', url.toString());
+          applyFilter(tag);
+        }));
+
+        // On load from URL
+        const initial = new URL(location.href).searchParams.get('tag');
+        if (initial) applyFilter(initial); else applyFilter('all');
+      })();
+    </script>
   </body>
 </html>
+
+
