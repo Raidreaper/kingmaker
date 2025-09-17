@@ -38,7 +38,12 @@ module.exports = async function handler(req, res) {
     }
     global.__rl.tokens -= 1;
 
-    const { message } = req.body || {};
+    // Parse JSON body defensively (Vercel may pass stringified body)
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch (_) { body = {}; }
+    }
+    const { message } = body || {};
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -101,6 +106,7 @@ SCOPE
     ].filter(Boolean);
 
     // Call Groq API with Llama 4 Scout model
+    const controller = new AbortController();
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -116,13 +122,20 @@ SCOPE
         stream: false, // Set to false for serverless function
         stop: null
       }),
+      signal: controller.signal,
     });
 
-    const data = await response.json();
-
+    // Handle non-2xx responses gracefully
+    let data;
+    try { data = await response.json(); } catch (_) { data = {}; }
+    if (!response.ok) {
+      const msg = (data && (data.error?.message || data.error)) || `Groq API returned ${response.status}`;
+      console.error('❌ Groq API HTTP Error:', response.status, msg);
+      return res.status(502).json({ error: 'Upstream AI service error', details: msg });
+    }
     if (data.error) {
       console.error('❌ Groq API Error:', data.error);
-      return res.status(500).json({ error: data.error.message });
+      return res.status(502).json({ error: data.error.message || 'Groq error' });
     }
 
     const aiResponse = data.choices[0].message.content;
