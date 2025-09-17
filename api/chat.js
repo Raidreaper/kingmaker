@@ -10,6 +10,27 @@ if (process.env.NODE_ENV !== 'production') {
 const https = require('https');
 const http = require('http');
 
+// Small utility to perform HTTPS JSON POST
+function httpsJsonPost({ hostname, path, headers, body, timeoutMs = 30000 }) {
+  return new Promise((resolve) => {
+    const req = https.request({ hostname, path, method: 'POST', headers, timeout: timeoutMs }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data || '{}');
+          resolve({ statusCode: res.statusCode || 0, body: parsed });
+        } catch (_) {
+          resolve({ statusCode: res.statusCode || 0, body: undefined, raw: data });
+        }
+      });
+    });
+    req.on('error', (err) => resolve({ error: `Network error: ${err.message}` }));
+    try { req.write(typeof body === 'string' ? body : JSON.stringify(body)); } catch (_) {}
+    req.end();
+  });
+}
+
 module.exports = async function handler(req, res) {
   // Set CORS headers for Vercel deployment
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -58,14 +79,11 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Your Groq API key
+    // Your API keys
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-    if (!GROQ_API_KEY) {
-      // Fallback placeholder response when key is not configured (e.g., local dev)
-      const reply = `You said: "${message}". The AI service is not configured yet. Please try again later.`;
-      return res.status(200).json({ response: reply });
-    }
+    // Build optional scraped context before calling models
 
     // Detect a URL in the user's message and scrape minimal readable text
     const urlRegex = /(https?:\/\/[^\s)]+)\/?/ig;
@@ -104,22 +122,41 @@ SCOPE
       { role: 'user', content: message }
     ].filter(Boolean);
 
-    // Call Groq API with Llama 4 Scout model using Node.js native HTTP
-    const groqResponse = await callGroqAPI(GROQ_API_KEY, messages);
-    
-    if (groqResponse.error) {
-      console.error('❌ Groq API Error:', groqResponse.error);
-      return res.status(502).json({ error: 'Upstream AI service error', details: groqResponse.error });
+    // Prefer Groq if configured, otherwise try Gemini; if primary fails, fall back to the other
+    let primaryTried = false;
+    let lastError = null;
+
+    if (GROQ_API_KEY) {
+      primaryTried = true;
+      const groqResponse = await callGroqAPI(GROQ_API_KEY, messages);
+      if (!groqResponse.error) {
+        const aiResponse = groqResponse.choices[0].message.content;
+        return res.status(200).json({ response: aiResponse, usage: groqResponse.usage, model: 'groq:meta-llama/llama-4-scout-17b-16e-instruct' });
+      }
+      lastError = `Groq: ${groqResponse.error}`;
     }
 
-    const aiResponse = groqResponse.choices[0].message.content;
-    console.log('✅ Groq API Response:', aiResponse);
+    if (GEMINI_API_KEY) {
+      const systemText = messages
+        .filter(m => m.role === 'system')
+        .map(m => m.content)
+        .join('\n\n');
+      const userText = message;
+      const geminiResponse = await callGeminiAPI(GEMINI_API_KEY, systemText, scrapedContext, userText);
+      if (!geminiResponse.error) {
+        const aiResponse = geminiResponse.text;
+        return res.status(200).json({ response: aiResponse, model: geminiResponse.model || 'gemini-1.5-flash' });
+      }
+      lastError = lastError ? `${lastError}; Gemini: ${geminiResponse.error}` : `Gemini: ${geminiResponse.error}`;
+    }
 
-    return res.status(200).json({ 
-      response: aiResponse,
-      usage: groqResponse.usage,
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct'
-    });
+    if (!primaryTried && !GEMINI_API_KEY) {
+      const reply = `You said: "${message}". The AI service is not configured yet. Please try again later.`;
+      return res.status(200).json({ response: reply });
+    }
+
+    // If both failed
+    return res.status(502).json({ error: 'Upstream AI service error', details: lastError || 'Unknown error' });
 
   } catch (error) {
     console.error('Groq API Error:', error);
@@ -225,6 +262,59 @@ function callGroqAPI(apiKey, messages) {
     });
 
     req.write(postData);
+    req.end();
+  });
+}
+
+// Helper function to call Google Gemini API
+// We convert our chat format into a single prompt: [SYSTEM]\n[CONTEXT]\n[USER]
+function callGeminiAPI(apiKey, systemText, scrapedContext, userText) {
+  return new Promise((resolve) => {
+    const promptParts = [];
+    if (systemText) promptParts.push(systemText);
+    if (scrapedContext) promptParts.push(`Webpage context (truncated):\n${scrapedContext}`);
+    if (userText) promptParts.push(userText);
+    const fullPrompt = promptParts.join('\n\n');
+
+    const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const path = `/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+
+    const body = {
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: fullPrompt }]
+        }
+      ]
+    };
+
+    const req = https.request({
+      hostname: 'generativelanguage.googleapis.com',
+      path: `${path}?key=${encodeURIComponent(apiKey)}`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data || '{}');
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+            const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            resolve({ text, model });
+          } else {
+            const msg = parsed.error?.message || `HTTP ${res.statusCode}`;
+            resolve({ error: msg });
+          }
+        } catch (err) {
+          resolve({ error: 'Invalid JSON response from Gemini API' });
+        }
+      });
+    });
+
+    req.on('error', (err) => resolve({ error: `Network error: ${err.message}` }));
+    req.setTimeout(30000, () => { req.destroy(); resolve({ error: 'Request timeout' }); });
+    req.write(JSON.stringify(body));
     req.end();
   });
 }
