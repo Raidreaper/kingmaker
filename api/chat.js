@@ -6,6 +6,10 @@ if (process.env.NODE_ENV !== 'production') {
   } catch (_) {}
 }
 
+// Use Node.js built-in modules for better Vercel compatibility
+const https = require('https');
+const http = require('http');
+
 module.exports = async function handler(req, res) {
   // Set CORS headers for Vercel deployment
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -70,18 +74,8 @@ module.exports = async function handler(req, res) {
     if (urls.length > 0) {
       const targetUrl = urls[0];
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-        const pageRes = await fetch(targetUrl, {
-          signal: controller.signal,
-          headers: { 'User-Agent': 'RaidBot/1.0 (+portfolio)' }
-        });
-        clearTimeout(timeout);
-        if (pageRes.ok) {
-          const html = await pageRes.text();
-          scrapedContext = extractReadableText(html);
-          if (scrapedContext.length > 12000) scrapedContext = scrapedContext.slice(0, 12000);
-        }
+        scrapedContext = await scrapeUrl(targetUrl);
+        if (scrapedContext.length > 12000) scrapedContext = scrapedContext.slice(0, 12000);
       } catch (_) {
         // ignore scraping failures
       }
@@ -110,45 +104,20 @@ SCOPE
       { role: 'user', content: message }
     ].filter(Boolean);
 
-    // Call Groq API with Llama 4 Scout model
-    const controller = new AbortController();
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        messages,
-        temperature: 1,
-        max_tokens: 1024,
-        top_p: 1,
-        stream: false, // Set to false for serverless function
-        stop: null
-      }),
-      signal: controller.signal,
-    });
-
-    // Handle non-2xx responses gracefully
-    let data;
-    try { data = await response.json(); } catch (_) { data = {}; }
-    if (!response.ok) {
-      const msg = (data && (data.error?.message || data.error)) || `Groq API returned ${response.status}`;
-      console.error('❌ Groq API HTTP Error:', response.status, msg);
-      return res.status(502).json({ error: 'Upstream AI service error', details: msg });
-    }
-    if (data.error) {
-      console.error('❌ Groq API Error:', data.error);
-      return res.status(502).json({ error: data.error.message || 'Groq error' });
+    // Call Groq API with Llama 4 Scout model using Node.js native HTTP
+    const groqResponse = await callGroqAPI(GROQ_API_KEY, messages);
+    
+    if (groqResponse.error) {
+      console.error('❌ Groq API Error:', groqResponse.error);
+      return res.status(502).json({ error: 'Upstream AI service error', details: groqResponse.error });
     }
 
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = groqResponse.choices[0].message.content;
     console.log('✅ Groq API Response:', aiResponse);
 
     return res.status(200).json({ 
       response: aiResponse,
-      usage: data.usage,
+      usage: groqResponse.usage,
       model: 'meta-llama/llama-4-scout-17b-16e-instruct'
     });
 
@@ -159,6 +128,105 @@ SCOPE
       message: 'Something went wrong while processing your request'
     });
   }
+}
+
+// Helper function to scrape URL content using Node.js native HTTP
+function scrapeUrl(url) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https:') ? https : http;
+    const timeout = setTimeout(() => reject(new Error('Timeout')), 10000);
+    
+    const req = client.get(url, {
+      headers: { 'User-Agent': 'RaidBot/1.0 (+portfolio)' }
+    }, (res) => {
+      clearTimeout(timeout);
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode}`));
+        return;
+      }
+      
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const text = extractReadableText(data);
+          resolve(text);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+    
+    req.on('error', (err) => {
+      clearTimeout(timeout);
+      reject(err);
+    });
+    
+    req.setTimeout(10000, () => {
+      req.destroy();
+      clearTimeout(timeout);
+      reject(new Error('Request timeout'));
+    });
+  });
+}
+
+// Helper function to call Groq API using Node.js native HTTP
+function callGroqAPI(apiKey, messages) {
+  return new Promise((resolve, reject) => {
+    const postData = JSON.stringify({
+      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      messages,
+      temperature: 1,
+      max_tokens: 1024,
+      top_p: 1,
+      stream: false,
+      stop: null
+    });
+
+    const options = {
+      hostname: 'api.groq.com',
+      port: 443,
+      path: '/openai/v1/chat/completions',
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+            const error = parsed.error?.message || parsed.error || `HTTP ${res.statusCode}`;
+            resolve({ error });
+          } else if (parsed.error) {
+            resolve({ error: parsed.error.message || 'Groq API error' });
+          } else {
+            resolve(parsed);
+          }
+        } catch (err) {
+          resolve({ error: 'Invalid JSON response from Groq API' });
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      resolve({ error: `Network error: ${err.message}` });
+    });
+
+    req.setTimeout(30000, () => {
+      req.destroy();
+      resolve({ error: 'Request timeout' });
+    });
+
+    req.write(postData);
+    req.end();
+  });
 }
 
 // Simple readable text extractor for scraped HTML
