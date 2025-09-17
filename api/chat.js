@@ -17,8 +17,13 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Lightweight health check via GET
+  if (req.method === 'GET') {
+    return res.status(200).json({ ok: true, message: 'RaidBot API is live' });
+  }
+
   // Only allow POST requests
-  if (req.method !== 'POST') {
+  if ((req.method || '').toUpperCase() !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
