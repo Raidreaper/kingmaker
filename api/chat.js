@@ -2,8 +2,13 @@
 // Load .env in local development so API keys are available
 if (process.env.NODE_ENV !== 'production') {
   try {
-    require('dotenv').config();
-  } catch (_) {}
+    const dotenv = require('dotenv');
+    if (dotenv && dotenv.config) {
+      dotenv.config();
+    }
+  } catch (err) {
+    console.log('dotenv not available:', err.message);
+  }
 }
 
 // Use Node.js built-in modules for better Vercel compatibility
@@ -82,6 +87,13 @@ module.exports = async function handler(req, res) {
     // Your API keys
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    
+    // Debug logging
+    console.log('Environment check:', {
+      hasGroq: !!GROQ_API_KEY,
+      hasGemini: !!GEMINI_API_KEY,
+      geminiKeyLength: GEMINI_API_KEY ? GEMINI_API_KEY.length : 0
+    });
 
     // Build optional scraped context before calling models
 
@@ -128,17 +140,25 @@ SCOPE
 
     if (GEMINI_API_KEY) {
       primaryTried = true;
-      const systemText = messages
-        .filter(m => m.role === 'system')
-        .map(m => m.content)
-        .join('\n\n');
-      const userText = message;
-      const geminiResponse = await callGeminiAPI(GEMINI_API_KEY, systemText, scrapedContext, userText);
-      if (!geminiResponse.error) {
-        const aiResponse = geminiResponse.text;
-        return res.status(200).json({ response: aiResponse, model: geminiResponse.model || 'gemini-1.5-flash' });
+      try {
+        const systemText = messages
+          .filter(m => m.role === 'system')
+          .map(m => m.content)
+          .join('\n\n');
+        const userText = message;
+        console.log('Calling Gemini API...');
+        const geminiResponse = await callGeminiAPI(GEMINI_API_KEY, systemText, scrapedContext, userText);
+        console.log('Gemini response:', { hasError: !!geminiResponse.error, error: geminiResponse.error });
+        
+        if (!geminiResponse.error) {
+          const aiResponse = geminiResponse.text;
+          return res.status(200).json({ response: aiResponse, model: geminiResponse.model || 'gemini-1.5-flash' });
+        }
+        lastError = `Gemini: ${geminiResponse.error}`;
+      } catch (geminiErr) {
+        console.error('Gemini API call failed:', geminiErr);
+        lastError = `Gemini call failed: ${geminiErr.message}`;
       }
-      lastError = `Gemini: ${geminiResponse.error}`;
     }
 
     if (GROQ_API_KEY) {
@@ -159,10 +179,12 @@ SCOPE
     return res.status(502).json({ error: 'Upstream AI service error', details: lastError || 'Unknown error' });
 
   } catch (error) {
-    console.error('Groq API Error:', error);
+    console.error('API Error:', error);
+    console.error('Error stack:', error.stack);
     return res.status(500).json({ 
       error: 'Internal server error',
-      message: 'Something went wrong while processing your request'
+      message: error.message || 'Something went wrong while processing your request',
+      details: error.stack
     });
   }
 }
@@ -213,11 +235,11 @@ function callGroqAPI(apiKey, messages) {
     const postData = JSON.stringify({
       model: 'meta-llama/llama-4-scout-17b-16e-instruct',
       messages,
-      temperature: 1,
-      max_tokens: 1024,
-      top_p: 1,
+        temperature: 1,
+        max_tokens: 1024,
+        top_p: 1,
       stream: false,
-      stop: null
+        stop: null
     });
 
     const options = {
