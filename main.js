@@ -731,7 +731,7 @@ function initCvModal() {
   }
 }
 
-  // AI Chat System - Groq AI Assistant (Vercel Version)
+  // AI Chat System - Gemini AI Assistant (Vercel Version)
 class PortfolioAIAssistant {
   constructor() {
     this.messages = [];
@@ -792,7 +792,7 @@ class PortfolioAIAssistant {
   addWelcomeMessage() {
     const welcomeMessage = {
       type: 'ai',
-      content: `👋 Hello! I'm RaidBot, your Portfolio AI Assistant powered by Groq! 
+      content: `👋 Hello! I'm RaidBot, your Portfolio AI Assistant powered by Gemini! 
 
 I can help you understand this portfolio and answer questions about:
 • The developer's skills and technologies
@@ -818,7 +818,7 @@ What would you like to know? 😊`
     this.showTypingIndicator();
 
     try {
-      // Get AI response from Groq API
+      // Get AI response from Gemini API
       const aiResponse = await this.getAIResponse(userInput);
       this.hideTypingIndicator();
       this.addMessage({ type: 'ai', content: aiResponse });
@@ -838,14 +838,18 @@ What would you like to know? 😊`
         body: JSON.stringify({ message: userInput }),
       });
 
-      // Graceful fallback in development or when API is unavailable
+      // Handle API errors
       if (!response.ok) {
-        // If 404 or network errors, return a placeholder so UI keeps working
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `HTTP ${response.status}`;
+        
+        // If 404, return a placeholder so UI keeps working
         if (response.status === 404) {
           return 'The AI service is not available in this environment. Using a local placeholder reply. Ask me about the portfolio!';
         }
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`API request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
+        
+        // For other errors, throw with more specific information
+        throw new Error(`API request failed: ${response.status} - ${errorMessage}`);
       }
 
       const data = await response.json();
@@ -856,8 +860,18 @@ What would you like to know? 😊`
       // Success
       return data.response;
     } catch (err) {
-      console.error('Groq API Error:', err);
-      // Network or other failures: provide a friendly fallback
+      console.error('AI API Error:', err);
+      
+      // Provide more specific error messages based on the error type
+      if (err.message.includes('Failed to fetch') || err.message.includes('Network error')) {
+        return 'Unable to connect to the AI service. Please check your internet connection or try again later.';
+      } else if (err.message.includes('500')) {
+        return 'The AI service is experiencing issues. This might be due to missing API keys or server problems. Please try again later.';
+      } else if (err.message.includes('API request failed')) {
+        return `AI service error: ${err.message}. Please try again or contact support if the issue persists.`;
+      }
+      
+      // Generic fallback for other errors
       return 'I couldn\'t reach the AI service right now. Here to help with info about this portfolio!';
     }
   }
@@ -900,7 +914,7 @@ What would you like to know? 😊`
       .replace(/>/g, '&gt;')
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>');
-
+    
     messageDiv.innerHTML = `
       <div class="ai-message-avatar ${avatarClass}">${avatar}</div>
       <div class="ai-message-content">${safeContent}</div>

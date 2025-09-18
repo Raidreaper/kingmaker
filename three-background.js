@@ -251,32 +251,32 @@ export class ThreeBackground {
     if (this.animationId) return;
     const loop = () => {
       this.animationId = requestAnimationFrame(loop);
-      
-      if (!this.isInitialized) return;
-  
-      const time = Date.now();
-      
-      // Update shader uniforms
+    
+    if (!this.isInitialized) return;
+
+    const time = Date.now();
+    
+    // Update shader uniforms
       if (this.material && this.material.uniforms && this.material.uniforms.time) {
-        this.material.uniforms.time.value = time;
+      this.material.uniforms.time.value = time;
+    }
+
+    // Rotate particles
+    if (this.particles) {
+      this.particles.rotation.x += 0.0005;
+      this.particles.rotation.y += 0.001;
+    }
+
+    // Rotate geometric shapes
+    this.scene.children.forEach((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.rotation.x += 0.005;
+        child.rotation.y += 0.01;
+        child.rotation.z += 0.002;
       }
-      
-      // Rotate particles
-      if (this.particles) {
-        this.particles.rotation.x += 0.0005;
-        this.particles.rotation.y += 0.001;
-      }
-      
-      // Rotate geometric shapes
-      this.scene.children.forEach((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.rotation.x += 0.005;
-          child.rotation.y += 0.01;
-          child.rotation.z += 0.002;
-        }
-      });
-      
-      this.renderer.render(this.scene, this.camera);
+    });
+
+    this.renderer.render(this.scene, this.camera);
     };
     loop();
   }

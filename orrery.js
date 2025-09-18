@@ -171,7 +171,7 @@ export class OrrerySystem {
 
     // Add asteroid belt
     this.createAsteroidBelt();
-}
+  }
 
   createAsteroidBelt() {
     const asteroidCount = 100;
