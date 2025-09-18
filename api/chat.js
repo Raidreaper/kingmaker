@@ -1,5 +1,5 @@
-// Serverless AI Chat Function for Vercel using Groq (CommonJS)
-// Load .env in local development so GROQ_API_KEY is available
+// Serverless AI Chat Function for Vercel using Gemini (CommonJS)
+// Load .env in local development so API keys are available
 if (process.env.NODE_ENV !== 'production') {
   try {
     require('dotenv').config();
@@ -101,8 +101,8 @@ module.exports = async function handler(req, res) {
 
     // Construct messages with optional scraped context
     const messages = [
-      {
-        role: 'system',
+          {
+            role: 'system',
         content: `You are RaidBot, an AI assistant for a developer portfolio.
 
 STYLE GUIDE
@@ -122,21 +122,12 @@ SCOPE
       { role: 'user', content: message }
     ].filter(Boolean);
 
-    // Prefer Groq if configured, otherwise try Gemini; if primary fails, fall back to the other
+    // Prefer Gemini as primary API, fall back to Groq if needed
     let primaryTried = false;
     let lastError = null;
 
-    if (GROQ_API_KEY) {
-      primaryTried = true;
-      const groqResponse = await callGroqAPI(GROQ_API_KEY, messages);
-      if (!groqResponse.error) {
-        const aiResponse = groqResponse.choices[0].message.content;
-        return res.status(200).json({ response: aiResponse, usage: groqResponse.usage, model: 'groq:meta-llama/llama-4-scout-17b-16e-instruct' });
-      }
-      lastError = `Groq: ${groqResponse.error}`;
-    }
-
     if (GEMINI_API_KEY) {
+      primaryTried = true;
       const systemText = messages
         .filter(m => m.role === 'system')
         .map(m => m.content)
@@ -147,10 +138,19 @@ SCOPE
         const aiResponse = geminiResponse.text;
         return res.status(200).json({ response: aiResponse, model: geminiResponse.model || 'gemini-1.5-flash' });
       }
-      lastError = lastError ? `${lastError}; Gemini: ${geminiResponse.error}` : `Gemini: ${geminiResponse.error}`;
+      lastError = `Gemini: ${geminiResponse.error}`;
     }
 
-    if (!primaryTried && !GEMINI_API_KEY) {
+    if (GROQ_API_KEY) {
+      const groqResponse = await callGroqAPI(GROQ_API_KEY, messages);
+      if (!groqResponse.error) {
+        const aiResponse = groqResponse.choices[0].message.content;
+        return res.status(200).json({ response: aiResponse, usage: groqResponse.usage, model: 'groq:meta-llama/llama-4-scout-17b-16e-instruct' });
+      }
+      lastError = lastError ? `${lastError}; Groq: ${groqResponse.error}` : `Groq: ${groqResponse.error}`;
+    }
+
+    if (!primaryTried && !GROQ_API_KEY) {
       const reply = `You said: "${message}". The AI service is not configured yet. Please try again later.`;
       return res.status(200).json({ response: reply });
     }
