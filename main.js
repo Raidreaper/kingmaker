@@ -736,8 +736,11 @@ class PortfolioAIAssistant {
   constructor() {
     this.messages = [];
     this.isOpen = false;
-    // Use Vercel serverless function
-    this.apiUrl = '/api/chat';
+    // Use robust AI API endpoint
+    this.apiUrl = '/api/ai';
+    this.retryCount = 0;
+    this.maxRetries = 3;
+    this.isRetrying = false;
     this.init();
   }
 
@@ -829,50 +832,107 @@ What would you like to know? 😊`
   }
 
   async getAIResponse(userInput) {
-    try {
+    return await this.executeWithRetry(async () => {
       const response = await fetch(this.apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ message: userInput }),
+        signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
-      // Handle API errors
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error || `HTTP ${response.status}`;
-        
-        // If 404, return a placeholder so UI keeps working
-        if (response.status === 404) {
-          return 'The AI service is not available in this environment. Using a local placeholder reply. Ask me about the portfolio!';
-        }
-        
-        // For other errors, throw with more specific information
-        throw new Error(`API request failed: ${response.status} - ${errorMessage}`);
+        const error = new Error(errorData.error || `HTTP ${response.status}`);
+        error.statusCode = response.status;
+        error.type = this.classifyErrorType(response.status);
+        throw error;
       }
 
       const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
+      
+      if (!data.success) {
+        const error = new Error(data.error || 'AI service error');
+        error.type = data.type || 'UNKNOWN';
+        error.correlationId = data.correlationId;
+        throw error;
       }
 
-      // Success
       return data.response;
-    } catch (err) {
-      console.error('AI API Error:', err);
-      
-      // Provide more specific error messages based on the error type
-      if (err.message.includes('Failed to fetch') || err.message.includes('Network error')) {
-        return 'Unable to connect to the AI service. Please check your internet connection or try again later.';
-      } else if (err.message.includes('500')) {
-        return 'The AI service is experiencing issues. This might be due to missing API keys or server problems. Please try again later.';
-      } else if (err.message.includes('API request failed')) {
-        return `AI service error: ${err.message}. Please try again or contact support if the issue persists.`;
+    });
+  }
+
+  async executeWithRetry(operation) {
+    let lastError;
+    
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      try {
+        this.retryCount = attempt;
+        this.isRetrying = attempt > 0;
+        
+        if (attempt > 0) {
+          console.log(`Retrying AI request (attempt ${attempt + 1}/${this.maxRetries + 1})`);
+          await this.sleep(this.calculateDelay(attempt));
+        }
+        
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        
+        if (!this.shouldRetry(error, attempt)) {
+          throw error;
+        }
+        
+        if (attempt === this.maxRetries) {
+          throw error;
+        }
       }
-      
-      // Generic fallback for other errors
-      return 'I couldn\'t reach the AI service right now. Here to help with info about this portfolio!';
+    }
+    
+    throw lastError;
+  }
+
+  shouldRetry(error, attempt) {
+    if (attempt >= this.maxRetries) return false;
+    if (error.type === 'API_KEY') return false;
+    if (error.statusCode >= 400 && error.statusCode < 500 && error.statusCode !== 429) return false;
+    return true;
+  }
+
+  calculateDelay(attempt) {
+    const baseDelay = 1000;
+    const maxDelay = 10000;
+    const multiplier = 2;
+    
+    let delay = baseDelay * Math.pow(multiplier, attempt);
+    delay = Math.min(delay, maxDelay);
+    return delay * (0.5 + Math.random() * 0.5); // Add jitter
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  classifyErrorType(statusCode) {
+    switch (statusCode) {
+      case 400:
+      case 422:
+        return 'CLIENT_ERROR';
+      case 401:
+      case 403:
+        return 'API_KEY_ERROR';
+      case 429:
+        return 'RATE_LIMIT';
+      case 408:
+        return 'TIMEOUT';
+      case 500:
+      case 502:
+      case 503:
+      case 504:
+        return 'SERVER_ERROR';
+      default:
+        return 'UNKNOWN';
     }
   }
 
@@ -929,22 +989,72 @@ What would you like to know? 😊`
   }
 
   showErrorMessage(error) {
-    let errorMessage = 'Sorry, I encountered an error while processing your request.';
+    let errorMessage = this.getUserFriendlyErrorMessage(error);
+    let canRetry = this.canRetry(error);
     
-    if (error.message.includes('Failed to fetch')) {
-      errorMessage = 'Unable to connect to the AI service. Please check your internet connection or try again later.';
-    } else if (error.message.includes('API key not configured')) {
-      errorMessage = 'AI service is not properly configured. Please contact the developer.';
-    } else if (error.message.includes('404')) {
-      errorMessage = 'AI service endpoint was not found. Please check if the service is properly deployed.';
-    } else if (error.message.includes('500')) {
-      errorMessage = 'AI service is temporarily unavailable. Please try again in a moment.';
+    let retryButton = '';
+    if (canRetry && this.retryCount < this.maxRetries) {
+      retryButton = `<br><br><button onclick="aiAssistant.retryLastMessage()" class="ai-retry-button">Retry (${this.retryCount}/${this.maxRetries})</button>`;
     }
     
     this.addMessage({ 
       type: 'ai', 
-      content: `${errorMessage}\n\n💡 <strong>Note:</strong> The AI chat service is deployed on Vercel. If issues persist, please contact the developer.` 
+      content: `⚠️ ${errorMessage}${retryButton}` 
     });
+  }
+
+  getUserFriendlyErrorMessage(error) {
+    switch (error.type) {
+      case 'CLIENT_ERROR':
+        return 'Invalid request. Please check your message and try again.';
+      case 'API_KEY_ERROR':
+        return 'AI service is not properly configured. Please contact support.';
+      case 'RATE_LIMIT':
+        return 'AI service is busy. Please wait a moment and try again.';
+      case 'TIMEOUT':
+        return 'Request timed out. Please try again.';
+      case 'SERVER_ERROR':
+        return 'AI service is temporarily unavailable. Please try again in a moment.';
+      case 'NETWORK':
+        return 'Unable to connect to AI service. Please check your internet connection.';
+      default:
+        if (error.message.includes('Failed to fetch')) {
+          return 'Unable to connect to the AI service. Please check your internet connection or try again later.';
+        } else if (error.message.includes('timeout')) {
+          return 'Request timed out. Please try again.';
+        } else if (error.message.includes('500')) {
+          return 'AI service is experiencing issues. Please try again later.';
+        }
+        return 'Something went wrong. Please try again or contact support if the issue persists.';
+    }
+  }
+
+  canRetry(error) {
+    if (this.retryCount >= this.maxRetries) return false;
+    if (error.type === 'API_KEY_ERROR') return false;
+    if (error.type === 'CLIENT_ERROR') return false;
+    return true;
+  }
+
+  async retryLastMessage() {
+    if (this.messages.length === 0) return;
+    
+    const lastUserMessage = [...this.messages].reverse().find(msg => msg.type === 'user');
+    if (!lastUserMessage) return;
+    
+    try {
+      this.isRetrying = true;
+      this.showTypingIndicator();
+      
+      const aiResponse = await this.getAIResponse(lastUserMessage.content);
+      this.hideTypingIndicator();
+      this.addMessage({ type: 'ai', content: aiResponse });
+    } catch (error) {
+      this.hideTypingIndicator();
+      this.showErrorMessage(error);
+    } finally {
+      this.isRetrying = false;
+    }
   }
 }
 
