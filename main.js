@@ -177,7 +177,7 @@ function initModals() {
       try {
         // Download PDF version
         const link = document.createElement('a');
-        link.href = '/assets/Michael%20cv.pdf';
+        link.href = '/assets/Michael cv.pdf';
         link.download = 'Michael cv.pdf';
         link.click();
       } catch (error) {
@@ -192,7 +192,7 @@ function initModals() {
       try {
         // Download DOCX version
         const link = document.createElement('a');
-        link.href = '/assets/Michael%20cv.docx';
+        link.href = '/assets/Michael cv.docx';
         link.download = 'Michael cv.docx';
         link.click();
       } catch (error) {
@@ -697,7 +697,7 @@ function initCvModal() {
     if (cvError) cvError.style.display = 'none';
     
     // Set the correct path for the CV
-    cvIframe.src = '/assets/Michael%20cv.pdf';
+    cvIframe.src = '/assets/Michael cv.pdf';
     
     // Add load event listener
     cvIframe.addEventListener('load', function() {
@@ -708,13 +708,19 @@ function initCvModal() {
           if (cvIframe.contentDocument || cvIframe.contentWindow) {
             showCvPreview();
           } else {
-            showCvError();
+            // Check if iframe src is still the same (didn't redirect to error page)
+            if (cvIframe.src.includes('Michael cv.pdf')) {
+              showCvPreview();
+            } else {
+              showCvError();
+            }
           }
         } catch (e) {
           // Cross-origin or other error, but PDF might still be loading
+          // If we get here, assume PDF loaded successfully
           showCvPreview();
         }
-      }, 1500); // Increased timeout for PDF loading
+      }, 2000); // Increased timeout for PDF loading
     });
     
     // Add error event listener
@@ -725,9 +731,20 @@ function initCvModal() {
     // Set timeout for loading
     setTimeout(() => {
       if (cvLoading && cvLoading.style.display !== 'none') {
-        showCvError();
+        // Try alternative approach - check if iframe loaded anything
+        try {
+          if (cvIframe.contentDocument && cvIframe.contentDocument.body) {
+            // If iframe has content, assume PDF loaded
+            showCvPreview();
+          } else {
+            showCvError();
+          }
+        } catch (e) {
+          // Cross-origin restriction, but PDF might still be visible
+          showCvPreview();
+        }
       }
-    }, 10000); // Increased timeout
+    }, 8000); // Reduced timeout
   }
 }
 
