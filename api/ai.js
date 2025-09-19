@@ -1,6 +1,6 @@
 // Vercel API Route with Robust Error Handling
-const AIService = require('../../lib/aiService');
-const { logError } = require('../../lib/errorHandler');
+const AIService = require('../lib/aiService');
+const { logError } = require('../lib/errorHandler');
 
 // Initialize AI service
 const aiService = new AIService({
@@ -8,7 +8,7 @@ const aiService = new AIService({
   maxRetries: 3
 });
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
