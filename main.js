@@ -177,7 +177,7 @@ function initModals() {
       try {
         // Download PDF version
         const link = document.createElement('a');
-        link.href = '/assets/Michael cv.pdf';
+        link.href = '/assets/Michael_cv.pdf';
         link.download = 'Michael cv.pdf';
         link.click();
       } catch (error) {
@@ -192,7 +192,7 @@ function initModals() {
       try {
         // Download DOCX version
         const link = document.createElement('a');
-        link.href = '/assets/Michael cv.docx';
+        link.href = '/assets/Michael_cv.docx';
         link.download = 'Michael cv.docx';
         link.click();
       } catch (error) {
@@ -697,7 +697,7 @@ function initCvModal() {
     if (cvError) cvError.style.display = 'none';
     
     // Set the correct path for the CV
-    cvIframe.src = '/assets/Michael cv.pdf';
+    cvIframe.src = '/assets/Michael_cv.pdf';
     
     // Add load event listener
     cvIframe.addEventListener('load', function() {
@@ -709,7 +709,7 @@ function initCvModal() {
             showCvPreview();
           } else {
             // Check if iframe src is still the same (didn't redirect to error page)
-            if (cvIframe.src.includes('Michael cv.pdf')) {
+            if (cvIframe.src.includes('Michael_cv.pdf')) {
               showCvPreview();
             } else {
               showCvError();
