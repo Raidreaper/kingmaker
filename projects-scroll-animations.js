@@ -47,22 +47,23 @@ export function initProjectsScrollAnimations() {
     const accent = panel.querySelector('.panel-accent');
 
     // Set initial hidden states (batch for performance)
+    // IMPORTANT: Don't hide projectMedia or projectCard - images need to be visible!
     if (projectInfo) gsap.set(projectInfo, { opacity: 0 });
-    if (projectMedia) gsap.set(projectMedia, { opacity: 0 });
+    // projectMedia stays visible so images can load and show
     if (title) gsap.set(title, { opacity: 0, y: 30 });
     if (description) gsap.set(description, { opacity: 0, y: 20 });
     if (tags.length) gsap.set(tags, { opacity: 0, scale: 0.9 });
     if (links.length) gsap.set(links, { opacity: 0, y: 15 });
     
+    // Keep projectCard visible but with subtle initial transform for animation
     if (projectCard && !isMobile) {
-      // Simplified initial transforms
       gsap.set(projectCard, { 
-        opacity: 0, 
-        x: isOdd ? 60 : -60,
-        scale: 0.9
+        opacity: 1, // KEEP VISIBLE!
+        x: isOdd ? 20 : -20, // Smaller initial offset
+        scale: 0.98 // Very subtle scale
       });
     } else if (projectCard) {
-      gsap.set(projectCard, { opacity: 0, y: 30 });
+      gsap.set(projectCard, { opacity: 1, y: 10 }); // KEEP VISIBLE!
     }
 
     if (accent) {
@@ -114,23 +115,21 @@ export function initProjectsScrollAnimations() {
       }, 0.4);
     }
 
-    // Project card animation (simplified for performance)
+    // Project card animation - just animate transform, keep opacity at 1
     if (projectCard) {
       if (!isMobile) {
         tl.to(projectCard, {
-          opacity: 1,
           x: 0,
           scale: 1,
-          duration: 0.8,
-          ease: 'power2.out'
-        }, 0.2);
-      } else {
-        tl.to(projectCard, {
-          opacity: 1,
-          y: 0,
           duration: 0.6,
           ease: 'power2.out'
-        }, 0.2);
+        }, 0.1);
+      } else {
+        tl.to(projectCard, {
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out'
+        }, 0.1);
       }
     }
 

@@ -67,6 +67,7 @@
         position: relative;
         perspective: 1200px;
         z-index: 1;
+        opacity: 1 !important; /* Force visible - images need to show */
       }
       .project-card {
         background: rgba(20,20,30,.45);
@@ -81,6 +82,7 @@
         position: relative;
         min-height: 300px;
         transform-style: preserve-3d;
+        opacity: 1 !important; /* Force visible - images need to show */
       }
       .project-card:hover {
         box-shadow: 0 25px 70px rgba(0,0,0,.45),
@@ -94,19 +96,19 @@
         display:block; 
         width:100%; 
         height:auto; 
-        opacity: 1;
-        transition: opacity 0.3s ease-in-out;
+        opacity: 1 !important; /* Force visible - override any GSAP or other styles */
+        transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
         object-fit: cover;
         min-height: 200px;
         background: rgba(20,20,30,.3);
         /* Show images immediately - don't hide them */
       }
       .project-card img.loading {
-        opacity: 0.7;
-        filter: blur(2px);
+        opacity: 1 !important; /* Still visible while loading */
+        filter: blur(1px);
       }
       .project-card img.loaded {
-        opacity: 1;
+        opacity: 1 !important;
         filter: none;
       }
       .project-card img[src=""],
@@ -674,17 +676,41 @@
         if (initial) applyFilter(initial); else applyFilter('all');
       })();
 
-      // Optimized Image Loading - Show images immediately, load fast
+      // CRITICAL: Image Loading - Force images to show immediately
       (function() {
+        // Force all image containers to be visible immediately
+        const projectCards = document.querySelectorAll('.project-card');
+        const projectMedia = document.querySelectorAll('.project-media');
+        
+        projectCards.forEach(card => {
+          card.style.opacity = '1';
+          card.style.visibility = 'visible';
+        });
+        
+        projectMedia.forEach(media => {
+          media.style.opacity = '1';
+          media.style.visibility = 'visible';
+        });
+        
         const projectImages = document.querySelectorAll('.project-card img');
+        
+        // Force all images to be visible immediately
+        projectImages.forEach(img => {
+          img.style.opacity = '1';
+          img.style.visibility = 'visible';
+          img.style.display = 'block';
+        });
         
         // Function to handle image load
         function handleImageLoad(img) {
           img.classList.remove('loading');
           img.classList.add('loaded');
+          img.style.opacity = '1';
+          img.style.visibility = 'visible';
           const card = img.closest('.project-card');
           if (card) {
             card.classList.add('image-loaded');
+            card.style.opacity = '1';
           }
         }
 
@@ -692,9 +718,12 @@
         function handleImageError(img) {
           img.classList.remove('loading');
           img.classList.add('loaded', 'error');
+          img.style.opacity = '1';
+          img.style.visibility = 'visible';
           const card = img.closest('.project-card');
           if (card) {
             card.classList.add('image-loaded');
+            card.style.opacity = '1';
           }
           
           // Show placeholder immediately
@@ -707,10 +736,12 @@
             const fallback = document.createElement('div');
             fallback.className = 'image-fallback';
             fallback.textContent = img.alt || 'Preview';
-            fallback.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.6); font-size: 0.9rem; text-align: center; pointer-events: none; z-index: 1;';
+            fallback.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.6); font-size: 0.9rem; text-align: center; pointer-events: none; z-index: 10;';
             const card = img.closest('.project-card');
             if (card) {
-              card.style.position = 'relative';
+              if (getComputedStyle(card).position === 'static') {
+                card.style.position = 'relative';
+              }
               card.appendChild(fallback);
             }
           }
@@ -718,6 +749,10 @@
 
         // Immediately process all images - show them right away
         projectImages.forEach((img, index) => {
+          // Force visibility
+          img.style.opacity = '1';
+          img.style.visibility = 'visible';
+          
           // Mark as loading initially
           if (!img.classList.contains('loaded')) {
             img.classList.add('loading');
@@ -730,7 +765,7 @@
           
           // For first 3 images, load immediately (above the fold)
           const isPriority = index < 3;
-          if (isPriority && img.loading === 'lazy') {
+          if (isPriority) {
             img.loading = 'eager';
             img.fetchPriority = 'high';
           }
@@ -747,7 +782,7 @@
             img.addEventListener('error', () => handleImageError(img), { once: true });
             
             // Faster timeout for priority images, longer for lazy
-            const timeout = isPriority ? 5000 : 8000;
+            const timeout = isPriority ? 3000 : 6000;
             setTimeout(() => {
               if (!img.classList.contains('loaded')) {
                 handleImageError(img);
@@ -758,20 +793,23 @@
 
         // Aggressive preloading for first 3 images
         const priorityImages = Array.from(projectImages).slice(0, 3);
-        priorityImages.forEach(img => {
+        priorityImages.forEach((img, idx) => {
           if (img.src && !img.complete) {
             // Create preload link
             const link = document.createElement('link');
             link.rel = 'preload';
             link.as = 'image';
             link.href = img.src;
-            if (priorityImages.indexOf(img) === 0) {
+            if (idx === 0) {
               link.fetchPriority = 'high';
             }
             document.head.appendChild(link);
             
             // Also preload using Image object for faster loading
             const preloadImg = new Image();
+            preloadImg.onload = () => {
+              img.src = img.src; // Trigger load
+            };
             preloadImg.src = img.src;
           }
         });
@@ -782,6 +820,8 @@
             entries.forEach(entry => {
               if (entry.isIntersecting) {
                 const img = entry.target;
+                img.style.opacity = '1';
+                img.style.visibility = 'visible';
                 if (!img.complete && !img.classList.contains('loading')) {
                   img.classList.add('loading');
                   // Force load
@@ -799,7 +839,7 @@
               }
             });
           }, {
-            rootMargin: '200px' // Start loading much earlier - 200px before viewport
+            rootMargin: '300px' // Start loading even earlier
           });
 
           // Observe all lazy-loaded images
