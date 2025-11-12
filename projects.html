@@ -16,9 +16,12 @@
         scroll-snap-type: y mandatory;
         overflow-y: auto;
         height: 100vh;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
       }
       .project-panel {
         scroll-snap-align: start;
+        scroll-snap-stop: always;
         min-height: 100vh;
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -26,9 +29,15 @@
         align-items: center;
         padding: 10vh 6vw;
         position: relative;
+        opacity: 1;
+        overflow: hidden;
       }
       .project-panel:nth-child(odd) {
         grid-template-columns: 1.1fr .9fr;
+      }
+      .project-info {
+        position: relative;
+        z-index: 1;
       }
       .project-info h2 {
         margin: 0 0 .6rem 0;
@@ -37,12 +46,25 @@
       }
       .project-info p { opacity: .9; }
       .tech-tags { margin-top: .75rem; display: flex; flex-wrap: wrap; gap: .5rem; }
-      .tech-tags .tag { padding: .35rem .6rem; border: 1px solid rgba(255,255,255,.15); border-radius: 999px; font-size: .85rem; opacity: .9; }
+      .tech-tags .tag { 
+        padding: .35rem .6rem; 
+        border: 1px solid rgba(255,255,255,.15); 
+        border-radius: 999px; 
+        font-size: .85rem; 
+        opacity: .9;
+      }
       .project-links { margin-top: 1rem; display: flex; gap: .75rem; }
-      .project-links a { text-decoration: none; padding: .6rem .9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); }
+      .project-links a { 
+        text-decoration: none; 
+        padding: .6rem .9rem; 
+        border-radius: 10px; 
+        border: 1px solid rgba(255,255,255,.2);
+        display: inline-block;
+      }
       .project-media {
         position: relative;
         perspective: 1200px;
+        z-index: 1;
       }
       .project-card {
         background: rgba(20,20,30,.45);
@@ -51,18 +73,139 @@
         border-radius: 16px;
         overflow: hidden;
         transform: rotateX(6deg) rotateY(-6deg);
-        box-shadow: 0 20px 60px rgba(0,0,0,.35);
+        box-shadow: 0 20px 60px rgba(0,0,0,.35),
+                    0 0 40px rgba(120,80,255,.1);
+        transition: box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+        min-height: 300px;
+        transform-style: preserve-3d;
       }
-      .project-card img { display:block; width:100%; height:auto; }
+      .project-card:hover {
+        box-shadow: 0 25px 70px rgba(0,0,0,.45),
+                    0 0 60px rgba(120,80,255,.2);
+        /* Transform handled by GSAP, only enhance shadow on hover */
+      }
+      .project-card.image-loaded {
+        will-change: auto;
+      }
+      .project-card img { 
+        display:block; 
+        width:100%; 
+        height:auto; 
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        object-fit: cover;
+        min-height: 200px;
+        background: rgba(20,20,30,.3);
+      }
+      .project-card img.loaded {
+        opacity: 1;
+      }
+      .project-card img[src=""],
+      .project-card img:not([src]) {
+        opacity: 0.3;
+      }
+      .project-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, 
+          rgba(255,255,255,0.03) 0%, 
+          rgba(255,255,255,0.08) 50%, 
+          rgba(255,255,255,0.03) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        z-index: 1;
+        border-radius: 16px;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+      .project-card.image-loaded::after {
+        opacity: 0;
+        animation: none;
+      }
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
       .panel-accent {
         position: absolute; inset: -2px; border-radius: 18px;
         background: radial-gradient(400px 200px at var(--mx,70%) var(--my,30%), rgba(120,80,255,.25), transparent 60%);
         pointer-events: none;
+        filter: blur(20px);
+        z-index: 0;
       }
       .snap-indicator { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: .85rem; opacity: .7; }
       @media (max-width: 960px){
-        .project-panel { grid-template-columns: 1fr; gap: 1.25rem; padding: 8vh 5vw; }
-        .project-card { transform: none; }
+        .project-panel { 
+          grid-template-columns: 1fr; 
+          gap: 1.5rem; 
+          padding: 6vh 4vw;
+          min-height: auto;
+        }
+        .project-card { 
+          transform: none !important;
+          min-height: 250px;
+        }
+        .project-info h2 {
+          font-size: 1.5rem;
+        }
+        .project-info p {
+          font-size: 0.9rem;
+        }
+        .tech-tags {
+          gap: 0.4rem;
+        }
+        .tech-tags .tag {
+          font-size: 0.75rem;
+          padding: 0.3rem 0.5rem;
+        }
+        .project-links {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .project-links a,
+        .project-links button {
+          width: 100%;
+          text-align: center;
+        }
+        .project-filters {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 0.5rem;
+        }
+        .project-filters button {
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .snap-indicator {
+          font-size: 0.75rem;
+          bottom: 12px;
+        }
+      }
+      
+      @media (max-width: 480px){
+        .project-panel {
+          padding: 5vh 3vw;
+          gap: 1.25rem;
+        }
+        .project-info h2 {
+          font-size: 1.25rem;
+        }
+        .project-card {
+          min-height: 200px;
+        }
+      }
+      
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .project-panel *,
+        .project-card,
+        .panel-accent {
+          animation: none !important;
+          transition: none !important;
+        }
       }
     </style>
   </head>
@@ -88,6 +231,9 @@
         </div>
         <nav class="navigation">
           <a href="index.html" class="nav-link">Home</a>
+          <a href="projects.html" class="nav-link active">Projects</a>
+          <a href="skills.html" class="nav-link">Skills</a>
+          <a href="about.html" class="nav-link">About</a>
           <button class="nav-link contact-btn" id="headerContactBtn">Contact Me</button>
          </nav>
         <div class="header-actions"><button class="icon-btn search-btn">🔍</button></div>
@@ -113,6 +259,8 @@
             <button class="btn btn-secondary" data-filter="python">Python</button>
             <button class="btn btn-secondary" data-filter="django">Django</button>
             <button class="btn btn-secondary" data-filter="postgresql">PostgreSQL</button>
+            <button class="btn btn-secondary" data-filter="php">PHP</button>
+            <button class="btn btn-secondary" data-filter="mysql">MySQL</button>
             <button class="btn btn-secondary" data-filter="seo">SEO</button>
             <button class="btn btn-secondary" data-filter="vercel">Vercel</button>
           </div>
@@ -127,11 +275,20 @@
                   <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">Three.js</span>
                 </div>
                   <div class="project-links">
-                  <a href="https://kingmaker.infy.uk" target="_blank">Live Demo</a>
+                  <a href="https://kingmaker-ten.vercel.app" target="_blank">Live Demo</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="personal-portfolio">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="/assets/m1.png" alt="Personal Portfolio"></div>
+                <div class="project-card">
+                  <img 
+                    src="/assets/m1.png" 
+                    alt="Personal Portfolio"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                  >
+                </div>
                 <div class="panel-accent"></div>
               </div>
             </article>
@@ -146,10 +303,19 @@
                 </div>
                 <div class="project-links">
                   <a href="https://Lover-livid.vercel.app" target="_blank">Live Demo</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="lovers-code">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="/assets/m2.png" alt="Lover's Code"></div>
+                <div class="project-card">
+                  <img 
+                    src="/assets/m2.png" 
+                    alt="Lover's Code"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                  >
+                </div>
                 <div class="panel-accent"></div>
               </div>
             </article>
@@ -164,51 +330,131 @@
                 </div>
                 <div class="project-links">
                   <a href="https://Tife.lovestoblog.com" target="_blank">Live Demo</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="tifes-gourmet">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="/assets/m3.png" alt="Tife's Gourmet"></div>
+                <div class="project-card">
+                  <img 
+                    src="/assets/m3.png" 
+                    alt="Tife's Gourmet"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </div>
                 <div class="panel-accent"></div>
               </div>
             </article>
 
-            <!-- Panel 4: Blogly -->
-            <article class="project-panel" data-accent data-tags="react,python,django,postgresql">
+            <!-- Panel 4: Springbase School Management System -->
+            <article class="project-panel" data-accent data-tags="php,mysql,javascript,html5,css3">
               <div class="project-info">
-                <h2>Blogly</h2>
-                <p>AI‑assisted blogging platform with authentication, CMS, and intelligent writing support.</p>
+                <h2>Springbase School Management System</h2>
+                <p>Comprehensive school administration platform with parent, admin, and student portals for academic progress tracking and management.</p>
                 <div class="tech-tags">
-                  <span class="tag">React</span><span class="tag">Python</span><span class="tag">Django</span><span class="tag">PostgreSQL</span>
+                  <span class="tag">PHP</span><span class="tag">MySQL</span><span class="tag">JavaScript</span><span class="tag">HTML5</span><span class="tag">CSS3</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://mi1.figureswork.com" target="_blank">Live Demo</a>
+                  <a href="https://www.springbase.com.ng/" target="_blank">Main Site</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="springbase-management">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="/assets/m4.png" alt="Blogly"></div>
+                <div class="project-card">
+                  <img 
+                    src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fadmin.springbase.com.ng%2F?w=1200" 
+                    alt="Springbase School Management System - Admin Portal"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  >
+                </div>
                 <div class="panel-accent"></div>
               </div>
             </article>
 
-            <!-- Panel 5: King of CMS -->
-            <article class="project-panel" data-accent data-tags="react,nodejs,mongodb,express">
+            <!-- Panel 5: Folashaye Global -->
+            <article class="project-panel" data-accent data-tags="html5,css3,javascript,react,seo">
               <div class="project-info">
-                <h2>King of CMS Consulting</h2>
-                <p>Consulting site featuring case studies, blog, and consultation booking.</p>
+                <h2>Folashaye Global</h2>
+                <p>Business solutions website for haulage, vocational services, construction, and exam registration services in Lagos State.</p>
                 <div class="tech-tags">
-                  <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">MongoDB</span><span class="tag">Express</span>
+                  <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">React</span><span class="tag">SEO</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://kingofcms.net" target="_blank">Live Demo</a>
+                  <a href="https://folashayeglobal.com/" target="_blank">Live Site</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="folashaye-global">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="/assets/m5.png" alt="King of CMS"></div>
+                <div class="project-card">
+                  <img 
+                    src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Ffolashayeglobal.com%2F?w=1200" 
+                    alt="Folashaye Global"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  >
+                </div>
                 <div class="panel-accent"></div>
               </div>
             </article>
 
-            <!-- Panel 6: MindSpace AI -->
+            <!-- Panel 6: ShopMaster -->
+            <article class="project-panel" data-accent data-tags="react,nextjs,typescript,tailwind">
+              <div class="project-info">
+                <h2>ShopMaster</h2>
+                <p>Modern business directory platform connecting customers with trusted local services and businesses.</p>
+                <div class="tech-tags">
+                  <span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://shopmaster.folashayeglobal.com/" target="_blank">Live Site</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="shopmaster">View Case Study</button>
+                </div>
+              </div>
+              <div class="project-media">
+                <div class="project-card">
+                  <img 
+                    src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fshopmaster.folashayeglobal.com%2F?w=1200" 
+                    alt="ShopMaster"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  >
+                </div>
+                <div class="panel-accent"></div>
+              </div>
+            </article>
+
+            <!-- Panel 7: InsightPilot -->
+            <article class="project-panel" data-accent data-tags="react,nextjs,typescript,tailwind,vercel">
+              <div class="project-info">
+                <h2>InsightPilot</h2>
+                <p>Data visualization tool that transforms CSVs into beautiful dashboards with automatic analysis and export capabilities.</p>
+                <div class="tech-tags">
+                  <span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span><span class="tag">Vercel</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://insightpilot-drab.vercel.app/" target="_blank">Live Demo</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="insightpilot">View Case Study</button>
+                </div>
+              </div>
+              <div class="project-media">
+                <div class="project-card">
+                  <img 
+                    src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Finsightpilot-drab.vercel.app%2F?w=1200" 
+                    alt="InsightPilot"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  >
+                </div>
+                <div class="panel-accent"></div>
+              </div>
+            </article>
+
+            <!-- Panel 8: MindSpace AI -->
             <article class="project-panel" data-accent data-tags="nextjs,typescript,tailwind,vercel">
               <div class="project-info">
                 <h2>MindSpace AI</h2>
@@ -218,15 +464,23 @@
                 </div>
                 <div class="project-links">
                   <a href="https://mindspace-ai.vercel.app/auth" target="_blank">Live Demo</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="mindspace-ai">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="/assets/MindSpace AI - Mental Wellness & Productivity Coach - Google Chrome 8_27_2025 12_13_26 AM.png" alt="MindSpace AI"></div>
+                <div class="project-card">
+                  <img 
+                    src="/assets/MindSpace AI - Mental Wellness & Productivity Coach - Google Chrome 8_27_2025 12_13_26 AM.png" 
+                    alt="MindSpace AI"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </div>
                 <div class="panel-accent"></div>
               </div>
             </article>
 
-            <!-- Panel 7: Springbase School -->
+            <!-- Panel 9: Springbase School -->
             <article class="project-panel" data-accent data-tags="html5,css3,javascript,seo">
               <div class="project-info">
                 <h2>Springbase School</h2>
@@ -236,10 +490,19 @@
                 </div>
                 <div class="project-links">
                   <a href="https://www.springbase.com.ng/" target="_blank">Live Site</a>
+                  <button class="btn btn-secondary case-study-btn" data-case-study="springbase-school">View Case Study</button>
                 </div>
               </div>
               <div class="project-media">
-                <div class="project-card"><img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fwww.springbase.com.ng%2F?w=1200" alt="Springbase Website"></div>
+                <div class="project-card">
+                  <img 
+                    src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fwww.springbase.com.ng%2F?w=1200" 
+                    alt="Springbase Website"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  >
+                </div>
                 <div class="panel-accent"></div>
             </div>
             </article>
@@ -286,8 +549,68 @@
       <div class="ai-chat-overlay" id="aiChatOverlay"></div>
     </div>
 
+    <!-- Case Study Modal -->
+    <div id="caseStudyModal" class="modal case-study-modal" role="dialog" aria-labelledby="caseStudyTitle" aria-hidden="true">
+      <div class="modal-content case-study-content">
+        <div class="modal-header case-study-header">
+          <div class="case-study-header-info">
+            <h2 id="caseStudyTitle" class="case-study-title"></h2>
+            <div class="case-study-meta">
+              <span class="case-study-client"></span>
+              <span class="case-study-duration"></span>
+            </div>
+          </div>
+          <button class="close-btn" id="closeCaseStudyModal" aria-label="Close case study">×</button>
+        </div>
+        
+        <div class="modal-body case-study-body">
+          <div class="case-study-section">
+            <h3 class="case-study-section-title">The Challenge</h3>
+            <p class="case-study-challenge"></p>
+          </div>
+
+          <div class="case-study-section">
+            <h3 class="case-study-section-title">My Role & Approach</h3>
+            <ul class="case-study-list case-study-role"></ul>
+          </div>
+
+          <div class="case-study-section">
+            <h3 class="case-study-section-title">Technical Implementation</h3>
+            <ul class="case-study-list case-study-technical"></ul>
+          </div>
+
+          <div class="case-study-section">
+            <h3 class="case-study-section-title">Results & Impact</h3>
+            <ul class="case-study-list case-study-results"></ul>
+          </div>
+
+          <div class="case-study-section case-study-gallery-section">
+            <h3 class="case-study-section-title">Visual Showcase</h3>
+            <div class="case-study-gallery">
+              <div class="case-study-gallery-container">
+                <button class="gallery-nav gallery-prev" aria-label="Previous image">‹</button>
+                <div class="gallery-viewport">
+                  <div class="gallery-track"></div>
+                </div>
+                <button class="gallery-nav gallery-next" aria-label="Next image">›</button>
+              </div>
+              <div class="gallery-indicators"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer case-study-footer">
+          <div class="case-study-footer-links">
+            <a href="#" class="btn btn-primary case-study-live-btn" target="_blank">View Live Demo</a>
+            <a href="#" class="btn btn-secondary case-study-github-btn" target="_blank" style="display: none;">View on GitHub</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="main.js" type="module"></script>
     <script src="three-background.js" type="module"></script>
+    <script src="projects-scroll-animations.js" type="module"></script>
     <script>
       // Parallax accent follows mouse per panel
       document.querySelectorAll('[data-accent]').forEach(panel => {
@@ -331,6 +654,112 @@
         // On load from URL
         const initial = new URL(location.href).searchParams.get('tag');
         if (initial) applyFilter(initial); else applyFilter('all');
+      })();
+
+      // Image Loading Optimization
+      (function() {
+        const projectImages = document.querySelectorAll('.project-card img');
+        
+        // Function to handle image load
+        function handleImageLoad(img) {
+          img.classList.add('loaded');
+          const card = img.closest('.project-card');
+          if (card) {
+            card.classList.add('image-loaded');
+          }
+        }
+
+        // Function to handle image error
+        function handleImageError(img) {
+          img.classList.add('loaded'); // Still show it as loaded to hide shimmer
+          const card = img.closest('.project-card');
+          if (card) {
+            card.classList.add('image-loaded');
+          }
+          // Set placeholder background and show alt text
+          img.style.backgroundColor = 'rgba(20,20,30,.5)';
+          img.style.minHeight = '200px';
+          img.style.display = 'flex';
+          img.style.alignItems = 'center';
+          img.style.justifyContent = 'center';
+          
+          // Create fallback text if image fails
+          if (!img.dataset.fallbackAdded) {
+            img.dataset.fallbackAdded = 'true';
+            const fallback = document.createElement('div');
+            fallback.textContent = img.alt || 'Image not available';
+            fallback.style.cssText = 'color: rgba(255,255,255,0.5); font-size: 0.9rem; padding: 2rem; text-align: center;';
+            img.parentNode.insertBefore(fallback, img);
+            img.style.display = 'none';
+          }
+        }
+
+        // Check if image is already loaded (cached)
+        projectImages.forEach(img => {
+          // Ensure src is set
+          if (!img.src && img.getAttribute('src')) {
+            img.src = img.getAttribute('src');
+          }
+          
+          if (img.complete && img.naturalHeight !== 0) {
+            handleImageLoad(img);
+          } else if (img.complete && img.naturalHeight === 0) {
+            // Image failed to load
+            handleImageError(img);
+          } else {
+            img.addEventListener('load', () => handleImageLoad(img), { once: true });
+            img.addEventListener('error', () => handleImageError(img), { once: true });
+            
+            // Timeout fallback - if image doesn't load in 10 seconds, show error
+            setTimeout(() => {
+              if (!img.classList.contains('loaded')) {
+                handleImageError(img);
+              }
+            }, 10000);
+          }
+        });
+
+        // Intersection Observer for lazy loading optimization
+        if ('IntersectionObserver' in window) {
+          const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const img = entry.target;
+                // Preload image if not already loading
+                if (!img.complete && !img.classList.contains('loading')) {
+                  img.classList.add('loading');
+                  // Force load by setting src again if needed
+                  if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    delete img.dataset.src;
+                  }
+                }
+                observer.unobserve(img);
+              }
+            });
+          }, {
+            rootMargin: '50px' // Start loading 50px before image enters viewport
+          });
+
+          // Observe all lazy-loaded images
+          projectImages.forEach(img => {
+            if (img.loading === 'lazy') {
+              imageObserver.observe(img);
+            }
+          });
+        }
+
+        // Preload first 2 images immediately
+        const firstImages = Array.from(projectImages).slice(0, 2);
+        firstImages.forEach(img => {
+          if (!img.complete) {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = img.src;
+            document.head.appendChild(link);
+          }
+        });
       })();
     </script>
   </body>

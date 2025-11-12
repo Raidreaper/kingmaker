@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Learn more about Obaniwa Michael's philosophy, values, and life beyond code.">
+    <meta name="keywords" content="Obaniwa Michael, About, Developer Philosophy, Personal Interests">
+    <meta name="author" content="Obaniwa Michael">
+    <meta name="robots" content="index, follow">
+
+    <title>About Obaniwa Michael | Philosophy & Personal Story</title>
+  </head>
+  <body class="about-page">
+    <!-- Three.js Background -->
+    <div id="particles-js">
+      <div id="loading-indicator" style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 18px;
+        z-index: 10;
+        text-align: center;
+      ">
+        <div style="
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(255,255,255,0.3);
+          border-top: 3px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 10px;
+        "></div>
+        Loading 3D Background...
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+
+    <div class="page-overlay"></div>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress-container">
+      <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+    </div>
+
+    <div id="app">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <span>R</span><span>a</span><span>i</span><span>d</span><span>r</span><span>e</span><span>a</span><span>p</span><span>e</span><span>r</span>
+          </div>
+        </div>
+        <nav class="navigation">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="projects.html" class="nav-link">Projects</a>
+          <a href="skills.html" class="nav-link">Skills</a>
+          <a href="about.html" class="nav-link active">About</a>
+          <button class="nav-link contact-btn" id="headerContactBtn">Contact Me</button>
+        </nav>
+        <div class="header-actions">
+          <button class="icon-btn search-btn">🔍</button>
+        </div>
+      </header>
+
+      <main class="main-content about-main">
+        <!-- Hero Intro -->
+        <section class="about-hero">
+          <h1 class="section-title">About Me</h1>
+          <p class="section-text">
+            I'm Obaniwa Michael, a full-stack developer driven by curiosity, empathy, and a love for building products that feel effortless to use.
+          </p>
+        </section>
+
+        <!-- Philosophy Section -->
+        <section class="philosophy-section">
+          <div class="section-header">
+            <h2 class="section-title">What Drives Me</h2>
+            <p class="section-text">My approach to solving problems blends user empathy, technical rigor, and a relentless focus on quality.</p>
+          </div>
+
+          <div class="philosophy-grid">
+            <article class="philosophy-card glass-card">
+              <div class="icon">🎯</div>
+              <h3>User-First Thinking</h3>
+              <p>
+                Technology should serve people, not complicate their lives. Every line of code I write starts with asking: "How does this help the user?"
+              </p>
+            </article>
+
+            <article class="philosophy-card glass-card">
+              <div class="icon">⚡</div>
+              <h3>Performance Matters</h3>
+              <p>
+                Beautiful design means nothing if it's slow. I'm obsessed with optimization—from 60fps animations to sub-three-second load times.
+              </p>
+            </article>
+
+            <article class="philosophy-card glass-card">
+              <div class="icon">🔧</div>
+              <h3>Build to Last</h3>
+              <p>
+                Quick fixes create long-term problems. I architect solutions that scale, remain maintainable, and adapt to future needs.
+              </p>
+            </article>
+
+            <article class="philosophy-card glass-card">
+              <div class="icon">🌱</div>
+              <h3>Always Learning</h3>
+              <p>
+                Tech moves fast. I stay current by building, experimenting, and pushing beyond my comfort zone with each project.
+              </p>
+            </article>
+
+            <article class="philosophy-card glass-card">
+              <div class="icon">🤝</div>
+              <h3>Collaboration Over Ego</h3>
+              <p>
+                The best solutions come from diverse perspectives. I listen, adapt, and believe great teams build great products.
+              </p>
+            </article>
+
+            <article class="philosophy-card glass-card">
+              <div class="icon">✨</div>
+              <h3>Details Define Quality</h3>
+              <p>
+                The difference between good and great? Attention to the small things—animations, error states, edge cases.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Personal Section -->
+        <section class="personal-section">
+          <div class="section-header">
+            <h2 class="section-title">Beyond the Code</h2>
+            <p class="section-text">A peek into the hobbies and interests that keep me inspired outside of shipping products.</p>
+          </div>
+
+          <div class="personal-content">
+            <div class="personal-text glass-card">
+              <p>When I'm not coding, you'll find me:</p>
+              <ul>
+                <li>🎮 Gaming (especially strategy and puzzle games)</li>
+                <li>📚 Reading about emerging tech and design trends</li>
+                <li>🎵 Exploring new music while debugging</li>
+                <li>🌍 Following global tech communities and open source projects</li>
+              </ul>
+              <p>
+                I believe the best developers are well-rounded humans who bring diverse perspectives to their work.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="copyright">
+          @2025 Obaniwa Michael all rights reserved
+        </div>
+        <div class="social-links">
+          <a href="https://wa.me/08071897468?text=Hello%20Obaniwa%20Michael!%20I%20would%20like%20to%20discuss%20a%20potential%20opportunity%20with%20you." target="_blank" class="social-icon whatsapp" title="WhatsApp"></a>
+          <a href="https://github.com/Raidreaper" target="_blank" class="social-icon github" title="GitHub"></a>
+        </div>
+      </footer>
+
+      <!-- AI Chat Button - Floating Action Button -->
+      <div class="ai-chat-fab" id="aiChatFab">
+        <div class="ai-chat-icon">🤖</div>
+        <div class="ai-chat-label">AI Assistant</div>
+      </div>
+
+      <!-- AI Chat Modal -->
+      <div class="ai-chat-modal" id="aiChatModal">
+        <div class="ai-chat-header">
+          <div class="ai-chat-title">
+            <span class="ai-avatar">🤖</span>
+            <span>RaidBot</span>
+          </div>
+          <button class="ai-chat-close" id="aiChatClose">×</button>
+        </div>
+
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
+
+        <div class="ai-chat-input-container">
+          <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask me about this portfolio...">
+          <button class="ai-chat-send" id="aiChatSend">➤</button>
+        </div>
+      </div>
+
+      <!-- AI Chat Overlay -->
+      <div class="ai-chat-overlay" id="aiChatOverlay"></div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Contact Me</h2>
+          <button class="close-btn" id="closeContactModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="contact-options">
+            <div class="contact-option">
+              <div class="contact-icon">📧</div>
+              <div class="contact-details">
+                <h3>Email</h3>
+                <p>Obaniwamichael17@gmail.com</p>
+                <button class="btn btn-primary" id="emailBtn">Send Email</button>
+              </div>
+            </div>
+            <div class="contact-option">
+              <div class="contact-icon">📞</div>
+              <div class="contact-details">
+                <h3>Phone</h3>
+                <p>08071897468</p>
+                <button class="btn btn-primary" id="phoneBtn">Call Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js" type="module"></script>
+    <script src="three-background.js" type="module"></script>
+    <script type="module">
+      // Import and initialize scrollytelling effects
+      import { initAboutScrollytelling } from './about-scrollytelling.js';
+      
+      // Scroll Progress Bar (always enabled)
+      function initScrollProgress() {
+        const scrollProgressBar = document.getElementById('scrollProgressBar');
+        if (!scrollProgressBar) return;
+        
+        function updateScrollProgress() {
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
+          
+          scrollProgressBar.style.width = Math.min(100, Math.max(0, scrollPercent)) + '%';
+        }
+        
+        updateScrollProgress();
+        window.addEventListener('scroll', updateScrollProgress, { passive: true });
+      }
+      
+      // Initialize on DOM ready
+      document.addEventListener('DOMContentLoaded', function() {
+        initScrollProgress();
+        initAboutScrollytelling();
+      });
+    </script>
+  </body>
+</html>
