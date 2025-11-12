@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Projects • Obaniwa Michael</title>
-    <link rel="preload" as="image" href="/assets/m1.png">
+    <link rel="preload" as="image" href="/assets/m1.png" fetchpriority="high">
+    <link rel="preload" as="image" href="/assets/m2.png" fetchpriority="high">
+    <link rel="preload" as="image" href="/assets/m3.png">
     <style>
       /* Page-specific styles (kept minimal and scoped) */
       :root {
@@ -92,38 +94,48 @@
         display:block; 
         width:100%; 
         height:auto; 
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
         object-fit: cover;
         min-height: 200px;
         background: rgba(20,20,30,.3);
+        /* Show images immediately - don't hide them */
+      }
+      .project-card img.loading {
+        opacity: 0.7;
+        filter: blur(2px);
       }
       .project-card img.loaded {
         opacity: 1;
+        filter: none;
       }
       .project-card img[src=""],
       .project-card img:not([src]) {
-        opacity: 0.3;
+        opacity: 0.5;
       }
       .project-card::after {
         content: '';
         position: absolute;
         inset: 0;
         background: linear-gradient(90deg, 
-          rgba(255,255,255,0.03) 0%, 
-          rgba(255,255,255,0.08) 50%, 
-          rgba(255,255,255,0.03) 100%);
+          rgba(255,255,255,0.02) 0%, 
+          rgba(255,255,255,0.05) 50%, 
+          rgba(255,255,255,0.02) 100%);
         background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
+        animation: shimmer 2s infinite;
         z-index: 1;
         border-radius: 16px;
         pointer-events: none;
-        opacity: 1;
+        opacity: 0.5;
         transition: opacity 0.3s ease;
       }
       .project-card.image-loaded::after {
         opacity: 0;
         animation: none;
+      }
+      .project-card img.loading + .project-card::after,
+      .project-card:has(img.loading)::after {
+        opacity: 0.5;
       }
       @keyframes shimmer {
         0% { background-position: -200% 0; }
@@ -287,6 +299,8 @@
                     loading="eager"
                     fetchpriority="high"
                     decoding="async"
+                    width="800"
+                    height="600"
                   >
                 </div>
                 <div class="panel-accent"></div>
@@ -314,6 +328,8 @@
                     loading="eager"
                     fetchpriority="high"
                     decoding="async"
+                    width="800"
+                    height="600"
                   >
                 </div>
                 <div class="panel-accent"></div>
@@ -338,8 +354,10 @@
                   <img 
                     src="/assets/m3.png" 
                     alt="Tife's Gourmet"
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
+                    width="800"
+                    height="600"
                   >
                 </div>
                 <div class="panel-accent"></div>
@@ -656,12 +674,13 @@
         if (initial) applyFilter(initial); else applyFilter('all');
       })();
 
-      // Image Loading Optimization
+      // Optimized Image Loading - Show images immediately, load fast
       (function() {
         const projectImages = document.querySelectorAll('.project-card img');
         
         // Function to handle image load
         function handleImageLoad(img) {
+          img.classList.remove('loading');
           img.classList.add('loaded');
           const card = img.closest('.project-card');
           if (card) {
@@ -669,97 +688,128 @@
           }
         }
 
-        // Function to handle image error
+        // Function to handle image error - show immediately with fallback
         function handleImageError(img) {
-          img.classList.add('loaded'); // Still show it as loaded to hide shimmer
+          img.classList.remove('loading');
+          img.classList.add('loaded', 'error');
           const card = img.closest('.project-card');
           if (card) {
             card.classList.add('image-loaded');
           }
-          // Set placeholder background and show alt text
-          img.style.backgroundColor = 'rgba(20,20,30,.5)';
+          
+          // Show placeholder immediately
+          img.style.backgroundColor = 'rgba(20,20,30,.6)';
           img.style.minHeight = '200px';
-          img.style.display = 'flex';
-          img.style.alignItems = 'center';
-          img.style.justifyContent = 'center';
           
           // Create fallback text if image fails
           if (!img.dataset.fallbackAdded) {
             img.dataset.fallbackAdded = 'true';
             const fallback = document.createElement('div');
-            fallback.textContent = img.alt || 'Image not available';
-            fallback.style.cssText = 'color: rgba(255,255,255,0.5); font-size: 0.9rem; padding: 2rem; text-align: center;';
-            img.parentNode.insertBefore(fallback, img);
-            img.style.display = 'none';
+            fallback.className = 'image-fallback';
+            fallback.textContent = img.alt || 'Preview';
+            fallback.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.6); font-size: 0.9rem; text-align: center; pointer-events: none; z-index: 1;';
+            const card = img.closest('.project-card');
+            if (card) {
+              card.style.position = 'relative';
+              card.appendChild(fallback);
+            }
           }
         }
 
-        // Check if image is already loaded (cached)
-        projectImages.forEach(img => {
+        // Immediately process all images - show them right away
+        projectImages.forEach((img, index) => {
+          // Mark as loading initially
+          if (!img.classList.contains('loaded')) {
+            img.classList.add('loading');
+          }
+          
           // Ensure src is set
           if (!img.src && img.getAttribute('src')) {
             img.src = img.getAttribute('src');
           }
           
+          // For first 3 images, load immediately (above the fold)
+          const isPriority = index < 3;
+          if (isPriority && img.loading === 'lazy') {
+            img.loading = 'eager';
+            img.fetchPriority = 'high';
+          }
+          
+          // Check if already loaded
           if (img.complete && img.naturalHeight !== 0) {
             handleImageLoad(img);
           } else if (img.complete && img.naturalHeight === 0) {
             // Image failed to load
             handleImageError(img);
           } else {
+            // Set up load/error handlers
             img.addEventListener('load', () => handleImageLoad(img), { once: true });
             img.addEventListener('error', () => handleImageError(img), { once: true });
             
-            // Timeout fallback - if image doesn't load in 10 seconds, show error
+            // Faster timeout for priority images, longer for lazy
+            const timeout = isPriority ? 5000 : 8000;
             setTimeout(() => {
               if (!img.classList.contains('loaded')) {
                 handleImageError(img);
               }
-            }, 10000);
+            }, timeout);
           }
         });
 
-        // Intersection Observer for lazy loading optimization
+        // Aggressive preloading for first 3 images
+        const priorityImages = Array.from(projectImages).slice(0, 3);
+        priorityImages.forEach(img => {
+          if (img.src && !img.complete) {
+            // Create preload link
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = img.src;
+            if (priorityImages.indexOf(img) === 0) {
+              link.fetchPriority = 'high';
+            }
+            document.head.appendChild(link);
+            
+            // Also preload using Image object for faster loading
+            const preloadImg = new Image();
+            preloadImg.src = img.src;
+          }
+        });
+
+        // Intersection Observer for lazy loading - start loading earlier
         if ('IntersectionObserver' in window) {
           const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
               if (entry.isIntersecting) {
                 const img = entry.target;
-                // Preload image if not already loading
                 if (!img.complete && !img.classList.contains('loading')) {
                   img.classList.add('loading');
-                  // Force load by setting src again if needed
+                  // Force load
                   if (img.dataset.src) {
                     img.src = img.dataset.src;
                     delete img.dataset.src;
+                  }
+                  // Preload if not already
+                  if (img.src && !img.complete) {
+                    const preloadImg = new Image();
+                    preloadImg.src = img.src;
                   }
                 }
                 observer.unobserve(img);
               }
             });
           }, {
-            rootMargin: '50px' // Start loading 50px before image enters viewport
+            rootMargin: '200px' // Start loading much earlier - 200px before viewport
           });
 
           // Observe all lazy-loaded images
-          projectImages.forEach(img => {
-            if (img.loading === 'lazy') {
+          projectImages.forEach((img, index) => {
+            // Don't observe first 3 (already loading)
+            if (index >= 3 && img.loading === 'lazy') {
               imageObserver.observe(img);
             }
           });
         }
-
-        // Preload first 2 images immediately
-        const firstImages = Array.from(projectImages).slice(0, 2);
-        firstImages.forEach(img => {
-          if (!img.complete) {
-            const link = document.createElement('link');
-            link.rel = 'preload';
-            link.as = 'image';
-            link.href = img.src;
-            document.head.appendChild(link);
-          }
-        });
       })();
     </script>
   </body>
