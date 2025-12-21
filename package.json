@@ -22,7 +22,9 @@
     "vite": "^5.0.0"
   },
   "dependencies": {
+    "@bsmnt/scrollytelling": "^0.3.3",
     "dotenv": "^17.2.2",
+    "gsap": "^3.13.0",
     "pdfjs-dist": "^5.4.54",
     "three": "^0.180.0"
   }

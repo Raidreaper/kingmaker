@@ -115,7 +115,8 @@ export default defineConfig({
       input: {
         main: 'index.html',
         projects: 'projects.html',
-        skills: 'skills.html'
+        skills: 'skills.html',
+        about: 'about.html'
       },
       output: {
         manualChunks: {

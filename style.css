@@ -3744,3 +3744,782 @@ body {
   }
 }
 
+/* Case Study Modal Styles */
+.case-study-modal {
+  z-index: 2000;
+}
+
+.case-study-content {
+  max-width: 1200px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.case-study-header {
+  flex-shrink: 0;
+  padding: 2rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.case-study-header-info {
+  flex: 1;
+}
+
+.case-study-title {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.case-study-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.case-study-meta span {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.case-study-meta span::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.case-study-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  max-height: calc(95vh - 200px);
+}
+
+.case-study-section {
+  margin-bottom: 2.5rem;
+}
+
+.case-study-section:last-child {
+  margin-bottom: 0;
+}
+
+.case-study-section-title {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent-color);
+  display: inline-block;
+}
+
+.case-study-challenge {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.case-study-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.case-study-list li {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.case-study-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.case-study-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Gallery Styles */
+.case-study-gallery-section {
+  margin-top: 3rem;
+}
+
+.case-study-gallery {
+  margin-top: 1.5rem;
+}
+
+.case-study-gallery-container {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+}
+
+.gallery-viewport {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.gallery-track {
+  display: flex;
+  transition: transform 0.4s ease;
+  will-change: transform;
+}
+
+.gallery-track img {
+  width: 100%;
+  height: auto;
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+  max-height: 500px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  opacity: 0.8;
+}
+
+.gallery-nav:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-prev {
+  left: 1rem;
+}
+
+.gallery-next {
+  right: 1rem;
+}
+
+.gallery-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.gallery-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.gallery-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.gallery-indicator.active {
+  background: var(--accent-color);
+  transform: scale(1.2);
+}
+
+.gallery-indicator:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Case Study Footer */
+.case-study-footer {
+  flex-shrink: 0;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.case-study-footer-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.case-study-footer-links .btn {
+  min-width: 150px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+/* Project Links Button Styles */
+.project-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.project-links .case-study-btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.project-links .case-study-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Case Study Modal */
+@media (max-width: 960px) {
+  .case-study-content {
+    max-width: 95%;
+    margin: 2% auto;
+  }
+
+  .case-study-header {
+    padding: 1.5rem;
+  }
+
+  .case-study-title {
+    font-size: 1.5rem;
+  }
+
+  .case-study-body {
+    padding: 1.5rem;
+  }
+
+  .case-study-section-title {
+    font-size: 1.25rem;
+  }
+
+  .gallery-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .gallery-prev {
+    left: 0.5rem;
+  }
+
+  .gallery-next {
+    right: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .case-study-content {
+    max-width: 100%;
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .case-study-header {
+    padding: 1rem;
+  }
+
+  .case-study-title {
+    font-size: 1.25rem;
+  }
+
+  .case-study-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .case-study-body {
+    padding: 1rem;
+    max-height: calc(100vh - 180px);
+  }
+
+  .case-study-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .case-study-section-title {
+    font-size: 1.1rem;
+  }
+
+  .case-study-challenge,
+  .case-study-list li {
+    font-size: 0.95rem;
+  }
+
+  .gallery-track img {
+    max-height: 300px;
+  }
+
+  .gallery-nav {
+    width: 35px;
+    height: 35px;
+    font-size: 1.25rem;
+  }
+
+  .case-study-footer {
+    padding: 1rem;
+  }
+
+  .case-study-footer-links {
+    flex-direction: column;
+  }
+
+  .case-study-footer-links .btn {
+    width: 100%;
+  }
+
+  .project-links {
+    flex-direction: column;
+  }
+
+  .project-links .case-study-btn {
+    width: 100%;
+  }
+}
+
+/* Animation for case study modal */
+@keyframes caseStudySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.case-study-modal.show .case-study-content {
+  animation: caseStudySlideIn 0.3s ease-out;
+}
+
+/* Focus trap styles */
+.case-study-modal.show {
+  display: block;
+}
+
+.case-study-modal:not(.show) {
+  display: none;
+}
+
+/* Scroll Progress Bar */
+.scroll-progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, 
+    var(--accent-color) 0%, 
+    rgba(255, 255, 255, 0.8) 50%, 
+    var(--accent-color) 100%);
+  background-size: 200% 100%;
+  animation: progressShimmer 2s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--accent-color);
+  transition: width 0.1s ease-out;
+}
+
+@keyframes progressShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* About Page & Philosophy Sections */
+.about-main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 4vw;
+  position: relative;
+}
+
+/* Scroll Section Parallax Base */
+.scroll-section {
+  position: relative;
+  will-change: transform, opacity;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.about-hero {
+  margin: 6vh auto 8vh;
+  max-width: 800px;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.about-hero .section-title {
+  margin-bottom: 1.25rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.about-hero .section-text {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  opacity: 0.95;
+}
+
+.section-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 4rem;
+}
+
+.section-header .section-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.section-header .section-text {
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+.philosophy-section {
+  padding: 4vh 0 6vh;
+  margin-bottom: 4vh;
+}
+
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.philosophy-card {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+  padding: 2rem;
+}
+
+.philosophy-card h3 {
+  font-size: 1.3rem;
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.philosophy-card p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.philosophy-card .icon {
+  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+/* Scroll-based Card Effects */
+.scroll-card {
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 0.2s ease-out;
+}
+
+.scroll-card:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  z-index: 10;
+  position: relative;
+}
+
+/* Depth layering for sections */
+.philosophy-section {
+  z-index: 1;
+  position: relative;
+}
+
+.personal-section {
+  z-index: 2;
+  position: relative;
+  padding: 4vh 0 6vh;
+}
+
+.personal-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.personal-text {
+  padding: 2.5rem;
+}
+
+.personal-text > p:first-child {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.personal-text ul {
+  list-style: none;
+  margin: 1.5rem 0 2rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.personal-text li {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 0;
+}
+
+.personal-text > p:last-child {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* Scroll reveal utility with enhanced effects */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Staggered reveal delays */
+.reveal-on-scroll[data-delay="0"] { transition-delay: 0s; }
+.reveal-on-scroll[data-delay="1"] { transition-delay: 0.1s; }
+.reveal-on-scroll[data-delay="2"] { transition-delay: 0.2s; }
+.reveal-on-scroll[data-delay="3"] { transition-delay: 0.3s; }
+.reveal-on-scroll[data-delay="4"] { transition-delay: 0.4s; }
+.reveal-on-scroll[data-delay="5"] { transition-delay: 0.5s; }
+
+/* Buttons */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--text-primary);
+}
+
+/* Responsive tweaks */
+@media (max-width: 1080px) {
+  .philosophy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .personal-content {
+    grid-template-columns: 1fr;
+  }
+
+  .personal-images {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .about-hero {
+    padding: 2.5rem 1.5rem;
+    margin-top: 12vh;
+  }
+
+  .philosophy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .personal-images {
+    grid-template-columns: 1fr;
+  }
+
+  .glass-card {
+    padding: 2rem;
+  }
+}
+
+/* Responsive About Page */
+@media (max-width: 1080px) {
+  .philosophy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .about-main {
+    padding: 0 3vw;
+  }
+}
+
+@media (max-width: 720px) {
+  .about-main {
+    padding: 0 4vw;
+  }
+
+  .about-hero {
+    margin: 4vh auto 6vh;
+    padding: 0 1rem;
+  }
+
+  .about-hero .section-title {
+    font-size: 1.8rem;
+  }
+
+  .about-hero .section-text {
+    font-size: 1rem;
+  }
+
+  .philosophy-section {
+    padding: 2vh 0 4vh;
+  }
+
+  .section-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-header .section-title {
+    font-size: 1.6rem;
+  }
+
+  .philosophy-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .philosophy-card {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .philosophy-card h3 {
+    font-size: 1.15rem;
+  }
+
+  .philosophy-card p {
+    font-size: 0.9rem;
+  }
+
+  .philosophy-card .icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.75rem;
+  }
+
+  .personal-section {
+    padding: 2vh 0 6vh;
+  }
+
+  .personal-text {
+    padding: 1.75rem;
+  }
+
+  .personal-text > p:first-child {
+    font-size: 1rem;
+  }
+
+  .personal-text li {
+    font-size: 0.95rem;
+  }
+}
+

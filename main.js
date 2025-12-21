@@ -1147,6 +1147,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize Scroll Progress Bar
   initScrollProgress();
   
+  // Initialize scroll reveal animations
+  initScrollReveal();
+  
   // Make retry function globally available
   window.retryCvLoad = retryCvLoad;
   
@@ -1175,3 +1178,394 @@ function initScrollProgress() {
     progressBar.style.width = scrollPercent + '%';
   });
 }
+
+// Scroll reveal animations for sections/cards
+function initScrollReveal() {
+  const revealElements = document.querySelectorAll('.reveal-on-scroll');
+  if (!revealElements.length) return;
+
+  if (typeof IntersectionObserver === 'undefined') {
+    revealElements.forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -10% 0px'
+  });
+
+  revealElements.forEach(el => observer.observe(el));
+}
+
+// Case Study Modal Functionality
+class CaseStudyModal {
+  constructor() {
+    this.modal = document.getElementById('caseStudyModal');
+    this.closeBtn = document.getElementById('closeCaseStudyModal');
+    this.caseStudies = null;
+    this.currentIndex = 0;
+    this.galleryImages = [];
+    this.focusableElements = null;
+    this.firstFocusableElement = null;
+    this.lastFocusableElement = null;
+    this.previousActiveElement = null;
+    
+    this.init();
+  }
+
+  async init() {
+    if (!this.modal) return;
+    
+    // Import case study data
+    try {
+      const { caseStudies } = await import('./case-study-data.js');
+      this.caseStudies = caseStudies;
+    } catch (error) {
+      console.error('Failed to load case study data:', error);
+      return;
+    }
+
+    // Bind events
+    this.bindEvents();
+    
+    // Check for deep link
+    this.checkDeepLink();
+  }
+
+  bindEvents() {
+    // Close button
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener('click', () => this.close());
+    }
+
+    // Close on overlay click
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) {
+        this.close();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.modal.classList.contains('show')) {
+        this.close();
+      }
+    });
+
+    // Case study buttons
+    document.querySelectorAll('.case-study-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const caseStudyId = e.target.getAttribute('data-case-study');
+        if (caseStudyId) {
+          this.previousActiveElement = e.target;
+          this.open(caseStudyId);
+        }
+      });
+    });
+
+    // Gallery navigation
+    const prevBtn = this.modal.querySelector('.gallery-prev');
+    const nextBtn = this.modal.querySelector('.gallery-next');
+    
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => this.prevImage());
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => this.nextImage());
+    }
+
+    // Keyboard navigation for gallery
+    this.modal.addEventListener('keydown', (e) => {
+      if (this.modal.classList.contains('show')) {
+        if (e.key === 'ArrowLeft') {
+          this.prevImage();
+        } else if (e.key === 'ArrowRight') {
+          this.nextImage();
+        }
+      }
+    });
+  }
+
+  checkDeepLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project');
+    const caseStudy = urlParams.get('case-study');
+    
+    if (projectId && caseStudy === 'true' && this.caseStudies) {
+      // Map project names to case study IDs
+      const projectMap = {
+        'portfolio': 'personal-portfolio',
+        'lovers-code': 'lovers-code',
+        'tifes-gourmet': 'tifes-gourmet',
+        'springbase-management': 'springbase-management',
+        'folashaye-global': 'folashaye-global',
+        'shopmaster': 'shopmaster',
+        'insightpilot': 'insightpilot',
+        'mindspace-ai': 'mindspace-ai',
+        'springbase-school': 'springbase-school'
+      };
+      
+      const caseStudyId = projectMap[projectId] || projectId;
+      setTimeout(() => this.open(caseStudyId), 500);
+    }
+  }
+
+  open(caseStudyId) {
+    if (!this.caseStudies) return;
+    
+    const caseStudy = this.caseStudies.find(cs => cs.id === caseStudyId);
+    if (!caseStudy) {
+      console.error('Case study not found:', caseStudyId);
+      return;
+    }
+
+    // Populate modal content
+    this.populateContent(caseStudy);
+    
+    // Show modal
+    this.modal.classList.add('show');
+    this.modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    
+    // Set up focus trap
+    this.setupFocusTrap();
+    
+    // Focus first focusable element
+    if (this.firstFocusableElement) {
+      this.firstFocusableElement.focus();
+    }
+    
+    // Update URL without reload
+    const url = new URL(window.location);
+    url.searchParams.set('project', caseStudyId);
+    url.searchParams.set('case-study', 'true');
+    window.history.pushState({}, '', url);
+  }
+
+  close() {
+    this.modal.classList.remove('show');
+    this.modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = 'auto';
+    
+    // Remove focus trap
+    this.removeFocusTrap();
+    
+    // Return focus to trigger button
+    if (this.previousActiveElement) {
+      this.previousActiveElement.focus();
+      this.previousActiveElement = null;
+    }
+    
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.delete('case-study');
+    window.history.pushState({}, '', url);
+  }
+
+  populateContent(caseStudy) {
+    // Title and meta
+    const titleEl = this.modal.querySelector('.case-study-title');
+    const clientEl = this.modal.querySelector('.case-study-client');
+    const durationEl = this.modal.querySelector('.case-study-duration');
+    
+    if (titleEl) titleEl.textContent = caseStudy.title;
+    if (clientEl) clientEl.textContent = caseStudy.client;
+    if (durationEl) durationEl.textContent = caseStudy.duration;
+
+    // Challenge
+    const challengeEl = this.modal.querySelector('.case-study-challenge');
+    if (challengeEl) challengeEl.textContent = caseStudy.challenge;
+
+    // Role
+    const roleList = this.modal.querySelector('.case-study-role');
+    if (roleList) {
+      roleList.innerHTML = caseStudy.role.map(item => `<li>${item}</li>`).join('');
+    }
+
+    // Technical
+    const technicalList = this.modal.querySelector('.case-study-technical');
+    if (technicalList) {
+      technicalList.innerHTML = caseStudy.technical.map(item => `<li>${item}</li>`).join('');
+    }
+
+    // Results
+    const resultsList = this.modal.querySelector('.case-study-results');
+    if (resultsList) {
+      resultsList.innerHTML = caseStudy.results.map(item => `<li>${item}</li>`).join('');
+    }
+
+    // Gallery
+    this.setupGallery(caseStudy.images);
+
+    // Footer links
+    const liveBtn = this.modal.querySelector('.case-study-live-btn');
+    const githubBtn = this.modal.querySelector('.case-study-github-btn');
+    
+    if (liveBtn) {
+      liveBtn.href = caseStudy.liveUrl;
+    }
+    
+    if (githubBtn && caseStudy.githubUrl) {
+      githubBtn.href = caseStudy.githubUrl;
+      githubBtn.style.display = 'inline-block';
+    } else if (githubBtn) {
+      githubBtn.style.display = 'none';
+    }
+  }
+
+  setupGallery(images) {
+    if (!images || images.length === 0) {
+      const gallerySection = this.modal.querySelector('.case-study-gallery-section');
+      if (gallerySection) gallerySection.style.display = 'none';
+      return;
+    }
+
+    const gallerySection = this.modal.querySelector('.case-study-gallery-section');
+    if (gallerySection) gallerySection.style.display = 'block';
+
+    this.galleryImages = images;
+    this.currentIndex = 0;
+
+    const track = this.modal.querySelector('.gallery-track');
+    const indicators = this.modal.querySelector('.gallery-indicators');
+    const prevBtn = this.modal.querySelector('.gallery-prev');
+    const nextBtn = this.modal.querySelector('.gallery-next');
+
+    if (!track || !indicators) return;
+
+    // Clear existing content
+    track.innerHTML = '';
+    indicators.innerHTML = '';
+
+    // Create image elements
+    images.forEach((src, index) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = `Project screenshot ${index + 1}`;
+      img.loading = 'lazy';
+      track.appendChild(img);
+
+      // Create indicator
+      const indicator = document.createElement('button');
+      indicator.className = 'gallery-indicator';
+      indicator.setAttribute('aria-label', `Go to image ${index + 1}`);
+      indicator.addEventListener('click', () => this.goToImage(index));
+      indicators.appendChild(indicator);
+    });
+
+    // Update display
+    this.updateGallery();
+  }
+
+  updateGallery() {
+    const track = this.modal.querySelector('.gallery-track');
+    const indicators = this.modal.querySelectorAll('.gallery-indicator');
+    const prevBtn = this.modal.querySelector('.gallery-prev');
+    const nextBtn = this.modal.querySelector('.gallery-next');
+
+    if (!track) return;
+
+    // Move track
+    const offset = -this.currentIndex * 100;
+    track.style.transform = `translateX(${offset}%)`;
+
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+      indicator.classList.toggle('active', index === this.currentIndex);
+    });
+
+    // Update navigation buttons
+    if (prevBtn) {
+      prevBtn.disabled = this.currentIndex === 0;
+    }
+    if (nextBtn) {
+      nextBtn.disabled = this.currentIndex === this.galleryImages.length - 1;
+    }
+  }
+
+  prevImage() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.updateGallery();
+    }
+  }
+
+  nextImage() {
+    if (this.currentIndex < this.galleryImages.length - 1) {
+      this.currentIndex++;
+      this.updateGallery();
+    }
+  }
+
+  goToImage(index) {
+    if (index >= 0 && index < this.galleryImages.length) {
+      this.currentIndex = index;
+      this.updateGallery();
+    }
+  }
+
+  setupFocusTrap() {
+    // Get all focusable elements
+    const focusableSelectors = [
+      'button:not([disabled])',
+      'a[href]',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])'
+    ].join(', ');
+
+    this.focusableElements = Array.from(
+      this.modal.querySelectorAll(focusableSelectors)
+    ).filter(el => {
+      return el.offsetParent !== null; // Only visible elements
+    });
+
+    if (this.focusableElements.length > 0) {
+      this.firstFocusableElement = this.focusableElements[0];
+      this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
+    }
+
+    // Trap focus within modal
+    this.modal.addEventListener('keydown', this.handleFocusTrap.bind(this));
+  }
+
+  handleFocusTrap(e) {
+    if (e.key !== 'Tab') return;
+
+    if (e.shiftKey) {
+      // Shift + Tab
+      if (document.activeElement === this.firstFocusableElement) {
+        e.preventDefault();
+        this.lastFocusableElement.focus();
+      }
+    } else {
+      // Tab
+      if (document.activeElement === this.lastFocusableElement) {
+        e.preventDefault();
+        this.firstFocusableElement.focus();
+      }
+    }
+  }
+
+  removeFocusTrap() {
+    this.focusableElements = null;
+    this.firstFocusableElement = null;
+    this.lastFocusableElement = null;
+  }
+}
+
+// Initialize Case Study Modal
+document.addEventListener('DOMContentLoaded', () => {
+  // Only initialize on projects page
+  if (document.getElementById('caseStudyModal')) {
+    window.caseStudyModal = new CaseStudyModal();
+  }
+});
